@@ -5,6 +5,8 @@
     <string name="server_URL">YOUR-SERVER-URL-OR-IP</string>
     <string name="script_path">YOUR-SCRIPT-PATH</string>
     <string name="script_name">YOUR-SCRIPT-NAME</string>
+    <string name="userresult">USER-RESULT-FROM-SERVER</string>
+    <string name="adminresult">ADMIN-RESULT-FROM-SERVER</string>
     <string name="action_log">Access Log</string>
     <string name="action_settings">Access Log</string>
     <string name="action_devices">Device List</string>
