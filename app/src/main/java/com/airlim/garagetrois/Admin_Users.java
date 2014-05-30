@@ -52,7 +52,7 @@ import java.util.List;
 //view users
 public class Admin_Users extends Activity {
     private String jsonResult;
-    private String url = "http://airlim.com/home/mo_garage.php";
+    private String url = "http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php";
 
 
     @Override
@@ -258,7 +258,7 @@ public class Admin_Users extends Activity {
                 HttpResponse response = httpclient.execute(httppost);
                 */
                 HttpClient client = new DefaultHttpClient();
-                HttpPost httpPOST = new HttpPost("http://airlim.com/home/mo_garage.php");
+                HttpPost httpPOST = new HttpPost("http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php");
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
 
                 params.add(new BasicNameValuePair("Admin", "viewusers"));
@@ -363,7 +363,7 @@ public class Admin_Users extends Activity {
 
             try {
                 HttpClient client = new DefaultHttpClient();
-                HttpPost httpPOST = new HttpPost("http://airlim.com/home/mo_garage.php");
+                HttpPost httpPOST = new HttpPost("http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php");
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("Name", urls[0]));
                 params.add(new BasicNameValuePair("UID", urls[1]));
