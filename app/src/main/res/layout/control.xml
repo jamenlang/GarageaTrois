@@ -1,0 +1,70 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:orientation="vertical"
+    android:layout_alignParentLeft="true"
+    android:layout_height="fill_parent">
+
+        <TextView
+            android:id="@+id/textView02"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+
+            android:textSize="20sp"
+            android:text="@string/placeholder" />
+
+    <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            />
+    <View
+        android:layout_width="1dp"
+        android:layout_height="20dp">
+    </View>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="2dp">
+        </View>
+        <ToggleButton
+            android:id="@+id/button3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textOn="Light"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:textOff="Light"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="2dp">
+        </View>
+
+        <ToggleButton
+            android:id="@+id/button4"
+            android:layout_width="fill_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_height="wrap_content"
+            android:textOn="Lock"
+            android:textOff="Lock"/>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="2dp">
+        </View>
+        <ToggleButton
+            android:id="@+id/button2"
+            android:layout_width="fill_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_height="wrap_content"
+            android:textOn="Door"
+            android:textOff="Door"
+             />
+
+</LinearLayout>
