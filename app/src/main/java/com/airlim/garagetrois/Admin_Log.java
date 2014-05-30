@@ -41,10 +41,10 @@ import java.util.List;
 //view log
 public class Admin_Log extends Activity {
     private String jsonResult;
-    private String url = getResources().getString(R.string.server_URL);
+    private String server = getResources().getString(R.string.server_URL);
     private String path = getResources().getString(R.string.script_path);
     private String script = getResources().getString(R.string.script_name);
-    private String fullurl = "http://"+url+((path != "")?"/"+path+"/"+script : script);
+    private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
