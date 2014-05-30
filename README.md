@@ -1,5 +1,6 @@
 GarageaTrois
 ============
+If viewing on GitHub use RAW to see the code formatting.
 
 Android App Client for GarageaTrois Server
 
