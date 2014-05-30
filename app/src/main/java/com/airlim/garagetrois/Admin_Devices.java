@@ -41,10 +41,10 @@ import java.util.List;
 //view devices
 public class Admin_Devices extends Activity {
     private String jsonResult;
-    private String url = getResources().getString(R.string.server_URL);
+    private String server = getResources().getString(R.string.server_URL);
     private String path = getResources().getString(R.string.script_path);
     private String script = getResources().getString(R.string.script_name);
-    private String fullurl = "http://"+url+((path != "")?"/"+path+"/"+script : script);
+    private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -291,7 +291,7 @@ public class Admin_Devices extends Activity {
 
             try {
                 HttpClient client = new DefaultHttpClient();
-                HttpPost httpPOST = new HttpPost("http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php");
+                HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 if (urls[0].length() > 0 && urls[2].length() < 5){
                     params.add(new BasicNameValuePair("Name", urls[0]));
