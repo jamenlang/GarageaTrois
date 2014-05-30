@@ -41,8 +41,10 @@ import java.util.List;
 //view devices
 public class Admin_Devices extends Activity {
     private String jsonResult;
-    private String url = "http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php";
-
+    private String url = getResources().getString(R.string.server_URL);
+    private String path = getResources().getString(R.string.script_path);
+    private String script = getResources().getString(R.string.script_name);
+    private String fullurl = "http://"+url+((path != "")?"/"+path+"/"+script : script);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,7 +185,7 @@ public class Admin_Devices extends Activity {
                 HttpResponse response = httpclient.execute(httppost);
                 */
                 HttpClient client = new DefaultHttpClient();
-                HttpPost httpPOST = new HttpPost("http://airlim.com/home/mo_garage.php");
+                HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
 
                 params.add(new BasicNameValuePair("Admin", "viewdevices"));
@@ -230,7 +232,7 @@ public class Admin_Devices extends Activity {
     public void accessWebService() {
         JsonReadTask task = new JsonReadTask();
         // passes values for the urls string array
-        task.execute(new String[] { url });
+        task.execute(new String[] { fullurl });
     }
 
     // build hash set for list view
