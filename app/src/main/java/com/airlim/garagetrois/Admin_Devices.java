@@ -41,7 +41,7 @@ import java.util.List;
 //view devices
 public class Admin_Devices extends Activity {
     private String jsonResult;
-    private String url = "http://airlim.com/home/mo_garage.php";
+    private String url = "http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php";
 
 
     @Override
@@ -289,7 +289,7 @@ public class Admin_Devices extends Activity {
 
             try {
                 HttpClient client = new DefaultHttpClient();
-                HttpPost httpPOST = new HttpPost("http://airlim.com/home/mo_garage.php");
+                HttpPost httpPOST = new HttpPost("http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php");
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 if (urls[0].length() > 0 && urls[2].length() < 5){
                     params.add(new BasicNameValuePair("Name", urls[0]));
