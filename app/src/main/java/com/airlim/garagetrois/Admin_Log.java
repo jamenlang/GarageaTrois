@@ -179,6 +179,11 @@ public class Admin_Log extends Activity {
 
     // Async Task to access the web
     private class JsonReadTask extends AsyncTask<String, Void, String> {
+        String server = getResources().getString(R.string.server_URL);
+        String path = getResources().getString(R.string.script_path);
+        String script = getResources().getString(R.string.script_name);
+        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
+        
         @Override
         protected String doInBackground(String... urls) {
             //HttpClient httpclient = new DefaultHttpClient();
@@ -189,7 +194,7 @@ public class Admin_Log extends Activity {
                 HttpResponse response = httpclient.execute(httppost);
                 */
                 HttpClient client = new DefaultHttpClient();
-                HttpPost httpPOST = new HttpPost("http://airlim.com/home/mo_garage.php");
+                HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
 
                 params.add(new BasicNameValuePair("Log", "viewlog"));
