@@ -187,13 +187,13 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
             return response;
         }
         protected void onPostExecute(String result) {
-            if(result.equals("hGKTZ5KSY2WSaQ==")){
+            if(result.equals("SUPER-SECRET-ADMIN-RESULT")){
                 authd = "true";
                 admind = "true";
                 show();
                 finish();
             }
-            else if(result.equals("pGKTZ6ioY2WoaQ==")){
+            else if(result.equals("SUPER-SECRET-USER-RESULT")){
                 authd = "true";
                 show();
                 finish();
