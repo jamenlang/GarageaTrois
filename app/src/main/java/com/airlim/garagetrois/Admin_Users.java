@@ -52,7 +52,10 @@ import java.util.List;
 //view users
 public class Admin_Users extends Activity {
     private String jsonResult;
-    private String url = "http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php";
+    private String url = getResources().getString(R.string.server_URL);
+    private String path = getResources().getString(R.string.script_path);
+    private String script = getResources().getString(R.string.script_name);
+    private String fullurl = "http://"+url+((path != "")?"/"+path+"/"+script : script);
 
 
     @Override
@@ -258,7 +261,7 @@ public class Admin_Users extends Activity {
                 HttpResponse response = httpclient.execute(httppost);
                 */
                 HttpClient client = new DefaultHttpClient();
-                HttpPost httpPOST = new HttpPost("http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php");
+                HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
 
                 params.add(new BasicNameValuePair("Admin", "viewusers"));
@@ -305,7 +308,7 @@ public class Admin_Users extends Activity {
     public void accessWebService() {
         JsonReadTask task = new JsonReadTask();
         // passes values for the urls string array
-        task.execute(new String[] { url });
+        task.execute(new String[] { fullurl });
     }
 
     // build hash set for list view
@@ -363,7 +366,7 @@ public class Admin_Users extends Activity {
 
             try {
                 HttpClient client = new DefaultHttpClient();
-                HttpPost httpPOST = new HttpPost("http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php");
+                HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("Name", urls[0]));
                 params.add(new BasicNameValuePair("UID", urls[1]));
