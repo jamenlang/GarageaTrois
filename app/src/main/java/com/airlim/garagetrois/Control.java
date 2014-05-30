@@ -237,7 +237,7 @@ public class Control extends MainActivity {
             for (String url : urls) {
                 try {
                     HttpClient client = new DefaultHttpClient();
-                    HttpPost httpPOST = new HttpPost("http://airlim.com/home/mo_garage.php");
+                    HttpPost httpPOST = new HttpPost("http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php");
                     List<NameValuePair> params = new ArrayList<NameValuePair>();
                     params.add(new BasicNameValuePair("UID", uid));
                     params.add(new BasicNameValuePair("DID", android_id));
