@@ -41,6 +41,10 @@ public class Control extends MainActivity {
     TextView textView;
     volatile String reverse = "false";
     volatile String uid = "0000";
+    private String server = getResources().getString(R.string.server_URL);
+    private String path = getResources().getString(R.string.script_path);
+    private String script = getResources().getString(R.string.script_name);
+    private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -237,7 +241,7 @@ public class Control extends MainActivity {
             for (String url : urls) {
                 try {
                     HttpClient client = new DefaultHttpClient();
-                    HttpPost httpPOST = new HttpPost("http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php");
+                    HttpPost httpPOST = new HttpPost(fullurl);
                     List<NameValuePair> params = new ArrayList<NameValuePair>();
                     params.add(new BasicNameValuePair("UID", uid));
                     params.add(new BasicNameValuePair("DID", android_id));
