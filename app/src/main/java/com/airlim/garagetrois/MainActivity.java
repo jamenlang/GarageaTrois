@@ -74,7 +74,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements NumberPicker.OnValueChangeListener{
-
+    private String url = getResources().getString(R.string.server_URL);
+    private String path = getResources().getString(R.string.script_path);
+    private String script = getResources().getString(R.string.script_name);
+    private String fullurl = "http://"+url+((path != "")?"/"+path+"/"+script : script);
+    private String userresult = getResources().getString(R.string.userresult);
+    private String adminresult = getResources().getString(R.string.adminresult);
 
     private TextView textView;
     //volatile String a, a2, a3, a4;
@@ -162,7 +167,7 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
 
                 try {
                     HttpClient client = new DefaultHttpClient();
-                    HttpPost httpPOST = new HttpPost("http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php");
+                    HttpPost httpPOST = new HttpPost(fullurl);
                     List<NameValuePair> params = new ArrayList<NameValuePair>();
                     params.add(new BasicNameValuePair("DID", android_id));
                     params.add(new BasicNameValuePair("TelNum", number));
@@ -187,13 +192,13 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
             return response;
         }
         protected void onPostExecute(String result) {
-            if(result.equals("SUPER-SECRET-ADMIN-RESULT")){
+            if(result.equals(adminresult)){
                 authd = "true";
                 admind = "true";
                 show();
                 finish();
             }
-            else if(result.equals("SUPER-SECRET-USER-RESULT")){
+            else if(result.equals(userresult)){
                 authd = "true";
                 show();
                 finish();
