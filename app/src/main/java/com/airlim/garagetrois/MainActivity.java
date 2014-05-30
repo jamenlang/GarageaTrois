@@ -74,10 +74,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements NumberPicker.OnValueChangeListener{
-    private String url = getResources().getString(R.string.server_URL);
+    private String server = getResources().getString(R.string.server_URL);
     private String path = getResources().getString(R.string.script_path);
     private String script = getResources().getString(R.string.script_name);
-    private String fullurl = "http://"+url+((path != "")?"/"+path+"/"+script : script);
+    private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
     private String userresult = getResources().getString(R.string.userresult);
     private String adminresult = getResources().getString(R.string.adminresult);
 
