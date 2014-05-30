@@ -41,7 +41,7 @@ import java.util.List;
 //view log
 public class Admin_Log extends Activity {
     private String jsonResult;
-    private String url = "http://airlim.com/home/mo_garage.php";
+    private String url = "http://SERVER-OR-IP-HERE/EXTRA-PATH/SERVER-SCRIPT.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
