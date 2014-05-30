@@ -52,11 +52,6 @@ import java.util.List;
 //view users
 public class Admin_Users extends Activity {
     private String jsonResult;
-    private String server = getResources().getString(R.string.server_URL);
-    private String path = getResources().getString(R.string.script_path);
-    private String script = getResources().getString(R.string.script_name);
-    private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -251,6 +246,10 @@ public class Admin_Users extends Activity {
         return s.matches("[-+]?\\d*\\.?\\d+");
     }
     private class JsonReadTask extends AsyncTask<String, Void, String> {
+        String server = getResources().getString(R.string.server_URL);
+        String path = getResources().getString(R.string.script_path);
+        String script = getResources().getString(R.string.script_name);
+        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
         @Override
         protected String doInBackground(String... urls) {
             //HttpClient httpclient = new DefaultHttpClient();
@@ -306,6 +305,10 @@ public class Admin_Users extends Activity {
     }// end async task
 
     public void accessWebService() {
+        String server = getResources().getString(R.string.server_URL);
+        String path = getResources().getString(R.string.script_path);
+        String script = getResources().getString(R.string.script_name);
+        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
         JsonReadTask task = new JsonReadTask();
         // passes values for the urls string array
         task.execute(new String[] { fullurl });
@@ -359,6 +362,10 @@ public class Admin_Users extends Activity {
         EditText editText = (EditText) findViewById(R.id.editText);
         CheckBox c1 = (CheckBox) findViewById(R.id.checkBox);
         LinearLayout actionView = (LinearLayout) findViewById(R.id.actionView);
+        String server = getResources().getString(R.string.server_URL);
+        String path = getResources().getString(R.string.script_path);
+        String script = getResources().getString(R.string.script_name);
+        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
 
         protected String doInBackground(String... urls) {
             String response = "";

@@ -41,10 +41,6 @@ import java.util.List;
 //view devices
 public class Admin_Devices extends Activity {
     private String jsonResult;
-    private String server = getResources().getString(R.string.server_URL);
-    private String path = getResources().getString(R.string.script_path);
-    private String script = getResources().getString(R.string.script_name);
-    private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +171,11 @@ public class Admin_Devices extends Activity {
 
     // Async Task to access the web
     private class JsonReadTask extends AsyncTask<String, Void, String> {
+
+        String server = getResources().getString(R.string.server_URL);
+        String path = getResources().getString(R.string.script_path);
+        String script = getResources().getString(R.string.script_name);
+        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
         @Override
         protected String doInBackground(String... urls) {
             //HttpClient httpclient = new DefaultHttpClient();
@@ -230,6 +231,10 @@ public class Admin_Devices extends Activity {
     }// end async task
 
     public void accessWebService() {
+        String server = getResources().getString(R.string.server_URL);
+        String path = getResources().getString(R.string.script_path);
+        String script = getResources().getString(R.string.script_name);
+        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
         JsonReadTask task = new JsonReadTask();
         // passes values for the urls string array
         task.execute(new String[] { fullurl });
@@ -283,6 +288,10 @@ public class Admin_Devices extends Activity {
     }
 
     private class AdminTask extends AsyncTask<String, String, String> {
+        String server = getResources().getString(R.string.server_URL);
+        String path = getResources().getString(R.string.script_path);
+        String script = getResources().getString(R.string.script_name);
+        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
         TextView textView = (TextView) findViewById(R.id.textView);
         EditText editText = (EditText) findViewById(R.id.editText);
         protected String doInBackground(String... urls) {

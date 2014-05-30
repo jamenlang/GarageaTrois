@@ -41,10 +41,6 @@ public class Control extends MainActivity {
     TextView textView;
     volatile String reverse = "false";
     volatile String uid = "0000";
-    private String server = getResources().getString(R.string.server_URL);
-    private String path = getResources().getString(R.string.script_path);
-    private String script = getResources().getString(R.string.script_name);
-    private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -213,6 +209,11 @@ public class Control extends MainActivity {
     private class ControlTask extends AsyncTask<String, String, String> {
         volatile String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         volatile String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
+        String server = getResources().getString(R.string.server_URL);
+        String path = getResources().getString(R.string.script_path);
+        String script = getResources().getString(R.string.script_name);
+        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
+
         public String getDeviceName() {
             String manufacturer = Build.MANUFACTURER;
             String model = Build.MODEL;

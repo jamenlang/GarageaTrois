@@ -74,12 +74,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements NumberPicker.OnValueChangeListener{
-    private String server = getResources().getString(R.string.server_URL);
-    private String path = getResources().getString(R.string.script_path);
-    private String script = getResources().getString(R.string.script_name);
-    private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
-    private String userresult = getResources().getString(R.string.userresult);
-    private String adminresult = getResources().getString(R.string.adminresult);
+
 
     private TextView textView;
     //volatile String a, a2, a3, a4;
@@ -91,6 +86,7 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //a = a2 = a3 = a4 = "0";
@@ -148,6 +144,12 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
 
     private class LogInTask extends AsyncTask<String, String, String> {
         volatile String android_id = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+        String server = getResources().getString(R.string.server_URL);
+        String path = getResources().getString(R.string.script_path);
+        String script = getResources().getString(R.string.script_name);
+        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
+        String userresult = getResources().getString(R.string.userresult);
+        String adminresult = getResources().getString(R.string.adminresult);
 
         volatile String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
         TelephonyManager telMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
