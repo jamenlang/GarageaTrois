@@ -4,7 +4,7 @@ If viewing on GitHub use RAW to see the code formatting.
 
 Android App Client for GarageaTrois Server
 
-Edit the following values in res/strings.xml
+Edit the following values in /app/src/main/res/values/strings.xml
 
 '<string name="server_URL">YOUR-SERVER-URL-OR-IP</string>'
 '<string name="script_path">YOUR-SCRIPT-PATH</string>'
