@@ -15,3 +15,5 @@ and make sure these two are the same as the server script.
 '<string name="adminresult">ADMIN-RESULT-FROM-SERVER</string>'
 '<string name="userresult">USER-RESULT-FROM-SERVER</string>'
 
+To Do:
+Post rough GPS coordinates if avaialble, useful for logging.
