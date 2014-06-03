@@ -1,6 +1,7 @@
 package com.airlim.garagetrois;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.airlim.garagetrois.MainActivity;
@@ -41,9 +44,11 @@ public class Control extends MainActivity {
     TextView textView;
     volatile String reverse = "false";
     volatile String uid = "0000";
+    GPSTracker gps;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         admind = intent.getStringExtra("admind");
@@ -54,7 +59,20 @@ public class Control extends MainActivity {
         ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
         ToggleButton b4 = (ToggleButton) findViewById(R.id.button4);
         textView = (TextView) findViewById(R.id.textView02);
+        gps = new GPSTracker(Control.this);
+        if(gps.canGetLocation()) {
 
+            double latitude = gps.getLatitude();
+            double longitude = gps.getLongitude();
+
+            // \n is for new line
+            //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+        } else {
+            // Can't get location.
+            // GPS or network is not enabled.
+            // Ask user to enable GPS/network in settings.
+            gps.showSettingsAlert();
+        }
         b3.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -207,12 +225,15 @@ public class Control extends MainActivity {
     }
 
     private class ControlTask extends AsyncTask<String, String, String> {
+        double latitude = gps.getLatitude();
+        double longitude = gps.getLongitude();
         volatile String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         volatile String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
         String server = getResources().getString(R.string.server_URL);
         String path = getResources().getString(R.string.script_path);
         String script = getResources().getString(R.string.script_name);
         String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
+
 
         public String getDeviceName() {
             String manufacturer = Build.MANUFACTURER;
@@ -248,6 +269,8 @@ public class Control extends MainActivity {
                     params.add(new BasicNameValuePair("DID", android_id));
                     params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
                     params.add(new BasicNameValuePair("hasNFC", nfc_support));
+                    params.add(new BasicNameValuePair("Latitude", String.valueOf(latitude)));
+                    params.add(new BasicNameValuePair("Longitude", String.valueOf(longitude)));
                     params.add(new BasicNameValuePair("switch", url));
                     UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                     httpPOST.setEntity(ent);
