@@ -271,6 +271,10 @@ public class Admin_Log extends Activity {
                 Group group = new Group(jsonChildNode.optString("date"));// + ":" + jsonChildNode.optString("action")
                 group.children.add("Action: " + jsonChildNode.optString("action"));
                 group.children.add("DID: " + jsonChildNode.optString("did"));
+                if (jsonChildNode.optString("latitude") != null && !jsonChildNode.optString("latitude").isEmpty()) {
+                    Log.v("latitude",jsonChildNode.optString("latitude"));
+                    group.children.add("Geo: " + jsonChildNode.optString("latitude") + ',' + jsonChildNode.optString("longitude"));
+                }
                 group.children.add("User: " + jsonChildNode.optString("name") + "(" + jsonChildNode.optString("uid") + ")");
                 group.children.add("Phone: " + jsonChildNode.optString("number"));
                 //String outPut = did + " : " + action;
