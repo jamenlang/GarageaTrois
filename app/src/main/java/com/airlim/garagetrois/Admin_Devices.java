@@ -70,13 +70,22 @@ public class Admin_Devices extends Activity {
         b2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                TextView checkTextView = (TextView) findViewById(R.id.checkTextView);
                 TextView toggleTextView = (TextView) findViewById(R.id.toggleTextView);
+                CheckBox c1 = (CheckBox) findViewById(R.id.checkBox);
                 ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
                 if (b2.isChecked()){
                     toggleTextView.setText("This device will be denied.");
+                    checkTextView.setVisibility(View.GONE);
+                    c1.setVisibility(View.GONE);
+                    c1.setChecked(false);
                 }
                 else{
                     toggleTextView.setText("This device will be allowed.");
+                    c1.setChecked(false);
+                    checkTextView.setText("Remote Access will be allowed.");
+                    checkTextView.setVisibility(View.VISIBLE);
+                    c1.setVisibility(View.VISIBLE);
                 }
             }
         });

@@ -70,12 +70,22 @@ public class Admin_Log extends Activity {
             public void onClick(View v) {
                 TextView textView = (TextView) findViewById(R.id.textView);
                 TextView toggleTextView = (TextView) findViewById(R.id.toggleTextView);
+                CheckBox c1 = (CheckBox) findViewById(R.id.checkBox);
+                TextView checkTextView = (TextView) findViewById(R.id.checkTextView);
                 ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
                 if (textView.getText().toString().length() > 5) {
                     if (b2.isChecked()) {
                         toggleTextView.setText("This device will be denied.");
+                        checkTextView.setVisibility(View.GONE);
+                        c1.setVisibility(View.GONE);
+                        checkTextView.setText("Remote Access will be allowed.");
+                        c1.setChecked(false);
                     } else {
                         toggleTextView.setText("This device will be allowed.");
+                        checkTextView.setVisibility(View.VISIBLE);
+                        checkTextView.setText("Remote Access will be allowed.");
+                        c1.setChecked(false);
+                        c1.setVisibility(View.VISIBLE);
                     }
                 }
                 else{
