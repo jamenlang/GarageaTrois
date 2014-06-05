@@ -44,7 +44,7 @@ public class NFC extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nfc);
         ControlTask task = new ControlTask();
-        task.execute(new String[]{"door"});
+        task.execute(new String[]{"Door"});
 
         textView = (TextView) findViewById(R.id.textView02);
 

@@ -82,7 +82,7 @@ public class Control extends MainActivity {
                 tb.setEnabled(!tb.isEnabled());
                 tb.setChecked(!tb.isChecked());
                 ControlTask task = new ControlTask();
-                task.execute(new String[] {"light"});
+                task.execute(new String[] {"Light"});
 
             }
         });
@@ -95,7 +95,7 @@ public class Control extends MainActivity {
                 tb.setEnabled(!tb.isEnabled());
                 tb.setChecked(!tb.isChecked());
                 ControlTask task = new ControlTask();
-                task.execute(new String[]{"door"});
+                task.execute(new String[]{"Door"});
             }
         });
         b4.setOnClickListener(new View.OnClickListener()
@@ -107,7 +107,7 @@ public class Control extends MainActivity {
                 tb.setEnabled(!tb.isEnabled());
                 tb.setChecked(!tb.isChecked());
                 ControlTask task = new ControlTask();
-                task.execute(new String[]{"lock"});
+                task.execute(new String[]{"Lock"});
             }
 
         });

@@ -129,13 +129,13 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         else if(children.startsWith("DID:")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.device, 0, 0, 0);
         }
-        else if(children.equals("Action: light")){
+        else if(children.equals("Action: Light")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.light, 0, 0, 0);
         }
-        else if(children.equals("Action: door")){
+        else if(children.equals("Action: Door")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.door, 0, 0, 0);
         }
-        else if(children.equals("Action: lock")){
+        else if(children.equals("Action: Lock")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.lock, 0, 0, 0);
         }
         else if(children.startsWith("Phone: ")){
@@ -391,13 +391,13 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         else if(group.children.contains("Allowed: 0")){
             ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
         }
-        else if(group.children.contains("Action: door")){
+        else if(group.children.contains("Action: Door")){
             ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.door, 0, 0, 0);
         }
-        else if(group.children.contains("Action: light")){
+        else if(group.children.contains("Action: Light")){
             ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.light, 0, 0, 0);
         }
-        else if(group.children.contains("Action: lock")){
+        else if(group.children.contains("Action: Lock")){
             ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.lock, 0, 0, 0);
         }
         else{
