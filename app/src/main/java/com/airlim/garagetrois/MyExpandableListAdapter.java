@@ -5,6 +5,9 @@ package com.airlim.garagetrois;
  */
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.ContextMenu;
@@ -29,6 +32,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
 
     private final SparseArray<Group> groups;
     public LayoutInflater inflater;
+    private Context context;
     public Activity activity;
     public Integer allexpanded = 0;
     public MyExpandableListAdapter(Activity act, SparseArray<Group> groups) {
@@ -104,6 +108,9 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         else if(children.equals("Force NFC: 0")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.world, 0, 0, 0);
         }
+        else if(children.startsWith("Geo:")){
+            text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.world, 0, 0, 0);
+        }
         else if(children.contains("Last updated: ")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.calendar, 0, 0, 0);
         }
@@ -156,7 +163,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Context context = v.getContext();
                 String result;
                 Toast.makeText(activity, children,
                         Toast.LENGTH_SHORT).show();
@@ -261,6 +268,35 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                     checkBox.setText("Edit Name");
                     checkBox.setChecked(false);
                     actionView.setVisibility(View.VISIBLE);
+                }
+                else if(children.startsWith("Geo: ")){
+                    String regex ="(\\-?(\\d+\\.\\d+)?),\\s*(\\-?\\d+(\\.\\d+)?)$";
+                    String latitude = null;
+                    String longitude = null;
+                    Matcher matcher = Pattern.compile(regex).matcher(children);
+                    if (matcher.find( ))
+                    {
+                        result = matcher.group();
+                        System.out.println(result);
+                        //Toast.makeText(activity, "Matches",1000 ).show();
+                        latitude = matcher.group(1);
+                        System.out.println(latitude);
+                        longitude = matcher.group(3);
+                        System.out.println(longitude);
+                        //Intent intent = new Intent(
+                        //       android.content.Intent.ACTION_VIEW,
+                        //        Uri.parse("http://maps.google.com/maps/@"+ latitude + "," + longitude + ",14z"));
+                        //intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                        //context.startActivity(intent);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:"+latitude+","+longitude+"?q="+latitude+","+longitude+"(Attempt Location)"));
+                        context.startActivity(intent);
+
+                    }
+                    else
+                    {
+                        Toast.makeText(activity, " Not valid latitude or longitude",1000 ).show();
+                        System.out.println("not valid lat/lon");
+                    }
                 }
             }
         });
@@ -392,5 +428,4 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return false;
     }
-
 }

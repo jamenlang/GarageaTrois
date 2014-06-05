@@ -81,6 +81,7 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
 
     volatile String authd = "false";
     volatile String admind = "false";
+    GPSTracker gps;
     public void onBackPressed() {
         finish();
     }
@@ -135,6 +136,21 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
                 //a4 = String.valueOf(np4.getValue());
             }
         });
+
+        gps = new GPSTracker(MainActivity.this);
+        if(gps.canGetLocation()) {
+
+            double latitude = gps.getLatitude();
+            double longitude = gps.getLongitude();
+
+            // \n is for new line
+            //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+        } else {
+            // Can't get location.
+            // GPS or network is not enabled.
+            // Ask user to enable GPS/network in settings.
+            gps.showSettingsAlert();
+        }
     }
     @Override
     public void onValueChange(NumberPicker picker, int oldVal, int newVal)
@@ -144,6 +160,8 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
 
     private class LogInTask extends AsyncTask<String, String, String> {
         volatile String android_id = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+        double latitude = gps.getLatitude();
+        double longitude = gps.getLongitude();
         String server = getResources().getString(R.string.server_URL);
         String path = getResources().getString(R.string.script_path);
         String script = getResources().getString(R.string.script_name);
@@ -174,6 +192,8 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
                     params.add(new BasicNameValuePair("DID", android_id));
                     params.add(new BasicNameValuePair("TelNum", number));
                     params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
+                    params.add(new BasicNameValuePair("Latitude", String.valueOf(latitude)));
+                    params.add(new BasicNameValuePair("Longitude", String.valueOf(longitude)));
                     params.add(new BasicNameValuePair("hasNFC", nfc_support));
                     params.add(new BasicNameValuePair("UID", urls[0]));
                     UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params,HTTP.UTF_8);
