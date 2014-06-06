@@ -207,7 +207,7 @@ public class Admin_Log extends Activity {
                 HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
 
-                params.add(new BasicNameValuePair("Log", "viewlog"));
+                params.add(new BasicNameValuePair("Admin", "viewlog"));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse response = client.execute(httpPOST);
