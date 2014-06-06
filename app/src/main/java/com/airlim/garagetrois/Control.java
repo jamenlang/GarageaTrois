@@ -70,10 +70,11 @@ public class Control extends MainActivity {
             double longitude = gps.getLongitude();
             if(geofence.equals("true")){
                 textView.setText("Geofence Enabled: GPS Ready.");
+                if(String.valueOf(latitude) == "0.0"){
+                    textView.setText("Geofence Enabled: GPS Empty.");
+                }
             }
-            if(String.valueOf(latitude) == "0.0"){
-                textView.setText("Geofence Enabled: GPS Empty.");
-            }
+
             Log.v("geofence",geofence);
             // \n is for new line
             //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
