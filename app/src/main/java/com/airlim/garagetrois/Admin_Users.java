@@ -319,7 +319,7 @@ public class Admin_Users extends Activity {
         SparseArray<Group> groups = new SparseArray<Group>();
         try {
             JSONObject jsonResponse = new JSONObject(jsonResult);
-            JSONArray jsonMainNode = jsonResponse.optJSONArray("user_info");
+            JSONArray jsonMainNode = jsonResponse.optJSONArray("auth_info");
 
             for (int i = 0; i < jsonMainNode.length(); i++) {
                 JSONObject jsonChildNode = jsonMainNode.getJSONObject(i);
