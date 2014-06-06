@@ -134,6 +134,7 @@ public class Control extends MainActivity {
     }
 
     public class LoadData extends AsyncTask<Void, Void, Void> {
+        Integer sleepytime = Integer.parseInt(getResources().getString(R.string.sleepytime));
         ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
         TextView textView = (TextView) findViewById(R.id.textView02);
         ProgressBar myProgress = (ProgressBar) findViewById(R.id.progressBar);
@@ -151,7 +152,7 @@ public class Control extends MainActivity {
             while(var != goal)
             {
                 try {
-                    Thread.sleep(114);
+                    Thread.sleep(sleepytime);
                     //my door takes exactly 11.4 seconds to open and close.
                 } catch (InterruptedException e) {
                     e.printStackTrace();
