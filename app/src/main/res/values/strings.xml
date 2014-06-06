@@ -8,16 +8,15 @@
     <string name="userresult">USER-RESULT-FROM-SERVER</string>
     <string name="adminresult">ADMIN-RESULT-FROM-SERVER</string>
     <string name="action_log">Access Log</string>
-    <string name="action_settings">Access Log</string>
     <string name="action_devices">Device List</string>
     <string name="action_users">User List</string>
     <string name="log_in">Log in</string>
     <string name="pin_entry">Log in by entering your PIN</string>
     <string name="placeholder">Choose an action to perform</string>
     <string name="hello_world">hi</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading&#8230;</string>
     <string name="launch_codes">Select an item to administer.</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="title">Title</string>
     <string name="enter_comment">Comment</string>
     <string name="edit_text">Name</string>
@@ -27,5 +26,5 @@
     <string name="admin_log">Garage à Trois - Access Log</string>
     <string name="admin_devices">Garage à Trois - Device List</string>
     <string name="admin_users">Garage à Trois - User List</string>
-    <string name="wait_for_server">Waiting for server...</string>
+    <string name="wait_for_server">Waiting for server&#8230;</string>
 </resources>
