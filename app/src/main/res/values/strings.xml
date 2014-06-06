@@ -7,6 +7,7 @@
     <string name="script_name">YOUR-SCRIPT-NAME</string>
     <string name="userresult">USER-RESULT-FROM-SERVER</string>
     <string name="adminresult">ADMIN-RESULT-FROM-SERVER</string>
+    <string name="sleepytime">HOW-LONG-IT-TAKES-FOR-DOOR-TO-MOVE(114 = 11.4 seconds)</string>
     <string name="action_log">Access Log</string>
     <string name="action_devices">Device List</string>
     <string name="action_users">User List</string>
