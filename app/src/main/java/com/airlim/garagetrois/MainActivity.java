@@ -81,6 +81,7 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
 
     volatile String authd = "false";
     volatile String admind = "false";
+    volatile String geofence = "false";
     GPSTracker gps;
     public void onBackPressed() {
         finish();
@@ -214,13 +215,21 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
             return response;
         }
         protected void onPostExecute(String result) {
-            if(result.equals(adminresult)){
+            if(result.startsWith(adminresult)){
+                String[] geofence_var = result.split(",");
+                geofence = geofence_var[1];
+                Log.v("geofence",geofence);
+                Log.v("result",result);
                 authd = "true";
                 admind = "true";
                 show();
                 finish();
             }
-            else if(result.equals(userresult)){
+            else if(result.startsWith(userresult)){
+                String[] geofence_var = result.split(",");
+                geofence = geofence_var[1];
+                Log.v("geofence",geofence);
+                Log.v("result",result);
                 authd = "true";
                 show();
                 finish();
@@ -267,9 +276,11 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
         intent.putExtra("uid", formatted);
         if (admind.equals("true")){
             intent.putExtra("admind", "true");
+            intent.putExtra("geofence", geofence);
         }
         else {
             intent.putExtra("admind", "false");
+            intent.putExtra("geofence", geofence);
         }
         startActivity(intent);
     }

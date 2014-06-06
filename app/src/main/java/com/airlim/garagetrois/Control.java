@@ -52,25 +52,38 @@ public class Control extends MainActivity {
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         admind = intent.getStringExtra("admind");
+        geofence = intent.getStringExtra("geofence");
+        Log.v("geofence",geofence);
 
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.control);
         ToggleButton b3 = (ToggleButton) findViewById(R.id.button3);
         ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
         ToggleButton b4 = (ToggleButton) findViewById(R.id.button4);
         textView = (TextView) findViewById(R.id.textView02);
+
         gps = new GPSTracker(Control.this);
         if(gps.canGetLocation()) {
 
             double latitude = gps.getLatitude();
             double longitude = gps.getLongitude();
-
+            if(geofence.equals("true")){
+                textView.setText("Geofence Enabled: GPS Ready.");
+            }
+            if(String.valueOf(latitude) == "0.0"){
+                textView.setText("Geofence Enabled: GPS Empty.");
+            }
+            Log.v("geofence",geofence);
             // \n is for new line
             //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
         } else {
             // Can't get location.
             // GPS or network is not enabled.
             // Ask user to enable GPS/network in settings.
+            if(geofence.equals("true")){
+                textView.setText("Geofence Enabled: GPS Not Available.");
+            }
             gps.showSettingsAlert();
         }
         b3.setOnClickListener(new View.OnClickListener()
