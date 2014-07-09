@@ -30,17 +30,12 @@ import java.util.List;
 
 
 public class NFC extends Activity {
-    private String server = getResources().getString(R.string.server_URL);
-    private String path = getResources().getString(R.string.script_path);
-    private String script = getResources().getString(R.string.script_name);
-    private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
-
     TextView textView;
+    volatile String party3 = "";
     volatile String uid = "nfc0";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nfc);
         ControlTask task = new ControlTask();
@@ -57,6 +52,10 @@ public class NFC extends Activity {
 
 
     private class ControlTask extends AsyncTask<String, String, String> {
+        private String server = getResources().getString(R.string.server_URL);
+        private String path = getResources().getString(R.string.script_path);
+        private String script = getResources().getString(R.string.script_name);
+        private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
         volatile String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         TelephonyManager telMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
         String number = telMgr.getLine1Number();

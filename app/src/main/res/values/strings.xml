@@ -2,11 +2,12 @@
 <resources>
 
     <string name="app_name">Garage à Trois</string>
-    <string name="server_URL">YOUR-SERVER-URL-OR-IP</string>
-    <string name="script_path">YOUR-SCRIPT-PATH</string>
-    <string name="script_name">YOUR-SCRIPT-NAME</string>
-    <string name="userresult">USER-RESULT-FROM-SERVER</string>
-    <string name="adminresult">ADMIN-RESULT-FROM-SERVER</string>
+    <string name="server_URL">airlim.com</string>
+    <string name="script_path">home</string>
+    <string name="script_name">GarageaTrois-Server.php</string>
+    <string name="userresult">grande</string>
+    <string name="adminresult">taco</string>
+    <string name="sleepytime">114</string>
     <string name="action_log">Access Log</string>
     <string name="action_devices">Device List</string>
     <string name="action_users">User List</string>
