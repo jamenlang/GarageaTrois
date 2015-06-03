@@ -22,8 +22,8 @@ e.g. taco or backstreetsback
 e.g. grande or alright!
 
 and finally sleepytime, the time that it takes the door to open and close.
-<string name="sleepytime">HOW-LONG-IT-TAKES-FOR-DOOR-TO-MOVE(114 = 11.4 seconds)</string>
-e.g. 114 for 11.4 or 309 for 30.9
+<string name="sleepytime">HOW-LONG-IT-TAKES-FOR-DOOR-TO-MOVE(11.4 = 11.4 seconds)</string>
+e.g. 11.4 for 11.4 or 30.9 for 30.9
 
 also set 
 <string name="disablesettings">true</string>
