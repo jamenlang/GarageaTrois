@@ -1,0 +1,38 @@
+<resources>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_communication">Communication Settings</string>
+
+    <string name="pref_title_nfc">Enable NFC</string>
+    <string name="pref_description_nfc">Use NFC to open garage door upon scanning a configured tag.
+    </string>
+
+    <string name="pref_title_server_name">Server</string>
+    <string name="pref_default_server_name">Host Name or IP</string>
+    <string name="pref_description_server_name">Host Server
+    </string>
+
+    <string name="pref_title_directory_name">Directory Name</string>
+    <string name="pref_default_directory_name">garage</string>
+    <string name="pref_description_directory_name">Host Directory
+    </string>
+
+    <string name="pref_title_script_name">Script Name</string>
+    <string name="pref_default_script_name">GarageaTrois-Server.php</string>
+    <string name="pref_description_script_name">Host Script Name
+    </string>
+
+    <string name="pref_title_sleepytime">Sleep Timeout</string>
+    <string name="pref_description_sleepytime">Time in Seconds it takes for the door to move.
+    </string>
+    <string name="pref_default_sleepytime">11.4</string>
+    <string name="pref_title_userresult">User Result</string>
+    <string name="pref_default_userresult">grande</string>
+    <string name="pref_title_adminresult">Admin Result</string>
+    <string name="pref_default_adminresult">taco</string>
+    <string name="pref_header_authentication_settings">Authentication Settings</string>
+    <string name="pref_header_server_settings">Server Settings</string>
+</resources>

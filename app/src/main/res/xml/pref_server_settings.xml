@@ -1,0 +1,58 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+    <CheckBoxPreference
+        android:key="allow_nfc"
+        android:title="@string/pref_title_nfc"
+        android:summary="@string/pref_description_nfc"
+        android:defaultValue="true" />
+    -->
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:key="server_URL"
+        android:title="@string/pref_title_server_name"
+        android:defaultValue="@string/pref_default_server_name"
+        android:summary="The full domain name or IP of the server."
+        android:selectAllOnFocus="true"
+        android:inputType="text"
+        android:capitalize="none"
+        android:singleLine="true"
+        android:maxLines="1" />
+
+    <EditTextPreference
+        android:key="script_path"
+        android:title="@string/pref_title_directory_name"
+        android:defaultValue="@string/pref_default_directory_name"
+        android:summary="The full path of the script on the server."
+        android:selectAllOnFocus="true"
+        android:inputType="text"
+        android:capitalize="none"
+        android:singleLine="true"
+        android:maxLines="1" />
+
+    <EditTextPreference
+        android:key="script_name"
+        android:title="@string/pref_title_script_name"
+        android:defaultValue="@string/pref_default_script_name"
+        android:summary="The full name of the script on the server."
+        android:selectAllOnFocus="true"
+        android:inputType="text"
+        android:capitalize="none"
+        android:singleLine="true"
+        android:maxLines="1" />
+
+    <EditTextPreference
+        android:key="sleepytime"
+        android:title="@string/pref_title_sleepytime"
+        android:summary="Sleep timeout in seconds [11.4]"
+        android:defaultValue="@string/pref_default_sleepytime"
+        android:selectAllOnFocus="true"
+        android:inputType="numberDecimal"
+        android:singleLine="true"
+        android:maxLines="1"
+    />
+    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it. -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+
+</PreferenceScreen>
