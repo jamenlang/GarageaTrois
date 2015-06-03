@@ -3,16 +3,16 @@ package com.airlim.garagetrois;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
-import android.view.MenuItem;
+import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -36,10 +36,12 @@ public class NFC extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Intent intent = getIntent();
+        party3 = intent.getStringExtra("party3");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nfc);
         ControlTask task = new ControlTask();
-        task.execute(new String[]{"Door"});
+        task.execute("Door");
 
         textView = (TextView) findViewById(R.id.textView02);
 
@@ -52,10 +54,12 @@ public class NFC extends Activity {
 
 
     private class ControlTask extends AsyncTask<String, String, String> {
-        private String server = getResources().getString(R.string.server_URL);
-        private String path = getResources().getString(R.string.script_path);
-        private String script = getResources().getString(R.string.script_name);
-        private String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
+
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
+
         volatile String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         TelephonyManager telMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
         String number = telMgr.getLine1Number();
@@ -73,7 +77,7 @@ public class NFC extends Activity {
 
                 HttpClient client = new DefaultHttpClient();
                 HttpPost httpPOST = new HttpPost(fullurl);
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                List<NameValuePair> params = new ArrayList<>();
                 params.add(new BasicNameValuePair("UID", uid));
                 params.add(new BasicNameValuePair("DID", android_id));
                 params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
@@ -85,7 +89,7 @@ public class NFC extends Activity {
                     HttpResponse execute = client.execute(httpPOST);
                     InputStream content = execute.getEntity().getContent();
                     BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                    String s = "";
+                    String s;
                     while ((s = buffer.readLine()) != null) {
                         response += s;
                     }
@@ -97,14 +101,15 @@ public class NFC extends Activity {
         }
 
         protected void onPostExecute(String result) {
-            if(result.equals("Door toggled")){
-                finish();
-            }
-            else if(result.equals("Log in")){
-                finish();
-            }
-            else{
-                alertbox("NFC",result);
+            switch (result){
+                case "Door toggled":
+                    finish();
+                    break;
+                case "Log in":
+                    finish();
+                    break;
+                default:
+                    alertbox("NFC",result);
             }
         }
         protected void alertbox(String title, String mymessage)
@@ -119,6 +124,5 @@ public class NFC extends Activity {
                             })
                     .show();
         }
-
     }
 }

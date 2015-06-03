@@ -1,37 +1,26 @@
 package com.airlim.garagetrois;
 
-/**
- * Created by jlang on 2/27/14.
- */
+
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.text.Layout;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.ContextMenu;
-import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -41,21 +30,24 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+
+import static junit.framework.Assert.assertEquals;
+
 //view users
 public class Admin_Users extends Activity {
     private String jsonResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SparseArray<Group> groups = new SparseArray<Group>();
+        //SparseArray<Group> groups = new SparseArray<Group>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin);
         ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
@@ -81,7 +73,7 @@ public class Admin_Users extends Activity {
                 if(editText.getText().toString().length() == 4 && isNumeric(editText.getText().toString()))
                 {
                     //edittext has the pin in it. the checkbox should be unchecked and say 'edit name' next to it.
-                    if (buttonView.isChecked() == true) {
+                    if (buttonView.isChecked()) {
 
                         Toast.makeText(Admin_Users.this, "Modify Name where UID=" + temp1,
                                 Toast.LENGTH_SHORT).show();
@@ -93,7 +85,7 @@ public class Admin_Users extends Activity {
                 }
                 else
                 {
-                    if (buttonView.isChecked() == false)
+                    if (!buttonView.isChecked())
                     {
                         Toast.makeText(Admin_Users.this, "Modify UID where Name=" + temp1,
                                 Toast.LENGTH_SHORT).show();
@@ -136,7 +128,7 @@ public class Admin_Users extends Activity {
                     if (!textView.getText().toString().equals("")) {
                         Log.v("shit", change);
                         //edittext is shown, there has to be a PIN to do anything from here.
-                        if (change == "change_pin"){
+                        if (change.equals("change_pin")){
                             String pin = editText.getText().toString();
                             String name = textView.getText().toString();
                             Log.v("shit", "we're changing the pin");
@@ -179,7 +171,7 @@ public class Admin_Users extends Activity {
                                         Toast.LENGTH_LONG).show();
                              }
 
-                        } else if (change == "change_name"){
+                        } else if (change.equals("change_name")){
                             String name = editText.getText().toString();
                             String pin = textView.getText().toString();
                             Log.v("shit changename", "we're changing the name");
@@ -232,24 +224,23 @@ public class Admin_Users extends Activity {
         });
         //createData();
         accessWebService();
-        ExpandableListView listView = (ExpandableListView) findViewById(R.id.listView);
-        MyExpandableListAdapter adapter = new MyExpandableListAdapter(this,
-                groups);
+        //ExpandableListView listView = (ExpandableListView) findViewById(R.id.listView);
+        //MyExpandableListAdapter adapter = new MyExpandableListAdapter(this,
+        //        groups);
         //listView.setAdapter(adapter);
         //listView = (ListView) findViewById(R.id.listView1);
         //accessWebService();
     }
-
 
     // Async Task to access the web
     public boolean isNumeric(String s) {
         return s.matches("[-+]?\\d*\\.?\\d+");
     }
     private class JsonReadTask extends AsyncTask<String, Void, String> {
-        String server = getResources().getString(R.string.server_URL);
-        String path = getResources().getString(R.string.script_path);
-        String script = getResources().getString(R.string.script_name);
-        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
         @Override
         protected String doInBackground(String... urls) {
             //HttpClient httpclient = new DefaultHttpClient();
@@ -261,7 +252,7 @@ public class Admin_Users extends Activity {
                 */
                 HttpClient client = new DefaultHttpClient();
                 HttpPost httpPOST = new HttpPost(fullurl);
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                List<NameValuePair> params = new ArrayList<>();
 
                 params.add(new BasicNameValuePair("Admin", "viewusers"));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
@@ -271,16 +262,14 @@ public class Admin_Users extends Activity {
                         response.getEntity().getContent()).toString();
             }
 
-            catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
         }
 
         private StringBuilder inputStreamToString(InputStream is) {
-            String rLine = "";
+            String rLine;
             StringBuilder answer = new StringBuilder();
             BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 
@@ -292,6 +281,8 @@ public class Admin_Users extends Activity {
 
             catch (IOException e) {
                 // e.printStackTrace();
+                Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+                if(debug)
                 Toast.makeText(getApplicationContext(),
                         "Error..." + e.toString(), Toast.LENGTH_LONG).show();
             }
@@ -300,23 +291,24 @@ public class Admin_Users extends Activity {
 
         @Override
         protected void onPostExecute(String result) {
-            ListDrwaer();
+            ListDrawer();
         }
     }// end async task
 
     public void accessWebService() {
-        String server = getResources().getString(R.string.server_URL);
-        String path = getResources().getString(R.string.script_path);
-        String script = getResources().getString(R.string.script_name);
-        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
         JsonReadTask task = new JsonReadTask();
         // passes values for the urls string array
-        task.execute(new String[] { fullurl });
+
+        task.execute(fullurl);
     }
 
     // build hash set for list view
-    public void ListDrwaer() {
-        SparseArray<Group> groups = new SparseArray<Group>();
+    public void ListDrawer() {
+        SparseArray<Group> groups = new SparseArray<>();
         try {
             JSONObject jsonResponse = new JSONObject(jsonResult);
             JSONArray jsonMainNode = jsonResponse.optJSONArray("auth_info");
@@ -334,6 +326,8 @@ public class Admin_Users extends Activity {
                 groups.append(i, group);
             }
         } catch (JSONException e) {
+            Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+            if(debug)
             Toast.makeText(getApplicationContext(), "Error" + e.toString(),
                     Toast.LENGTH_SHORT).show();
         }
@@ -350,31 +344,29 @@ public class Admin_Users extends Activity {
         listView.setAdapter(simpleAdapter);
         */
     }
-
+    /*
     private HashMap<String, String> createEmployee(String name, String number) {
         HashMap<String, String> employeeNameNo = new HashMap<String, String>();
         employeeNameNo.put(name, number);
         return employeeNameNo;
     }
-
+    */
     private class AdminTask extends AsyncTask<String, String, String> {
         TextView textView = (TextView) findViewById(R.id.textView);
         EditText editText = (EditText) findViewById(R.id.editText);
-        CheckBox c1 = (CheckBox) findViewById(R.id.checkBox);
+        //CheckBox c1 = (CheckBox) findViewById(R.id.checkBox);
         LinearLayout actionView = (LinearLayout) findViewById(R.id.actionView);
-        String server = getResources().getString(R.string.server_URL);
-        String path = getResources().getString(R.string.script_path);
-        String script = getResources().getString(R.string.script_name);
-        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
-
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
         protected String doInBackground(String... urls) {
             String response = "";
-            String adminaction = "";
 
             try {
                 HttpClient client = new DefaultHttpClient();
                 HttpPost httpPOST = new HttpPost(fullurl);
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                List<NameValuePair> params = new ArrayList<>();
                 params.add(new BasicNameValuePair("Name", urls[0]));
                 params.add(new BasicNameValuePair("UID", urls[1]));
                 params.add(new BasicNameValuePair("Change", urls[2]));
@@ -384,7 +376,7 @@ public class Admin_Users extends Activity {
                 HttpResponse execute = client.execute(httpPOST);
                 InputStream content = execute.getEntity().getContent();
                 BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                String s = "";
+                String s;
                 while ((s = buffer.readLine()) != null) {
                     response += s;
                 }
@@ -398,10 +390,11 @@ public class Admin_Users extends Activity {
             textView.setText("");
             editText.setText("");
             actionView.setVisibility(View.GONE);
+            Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+            if(debug)
             Toast.makeText(Admin_Users.this, result,
                     Toast.LENGTH_LONG).show();
             accessWebService();
         }
     }
-
 }

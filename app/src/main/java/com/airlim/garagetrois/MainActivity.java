@@ -1,28 +1,22 @@
 package com.airlim.garagetrois;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.os.Build;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.util.Log;
-import android.view.View;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -37,43 +31,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.NumberPicker;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.ToggleButton;
+import android.widget.Toast;
 
-import com.airlim.garagetrois.MainActivity;
+import static java.lang.Integer.valueOf;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends ActionBarActivity implements NumberPicker.OnValueChangeListener{
+public class MainActivity extends Activity implements NumberPicker.OnValueChangeListener{
 
 
     private TextView textView;
@@ -116,25 +79,29 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
         np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                //a = String.valueOf(np.getValue());
+                //String a = String.valueOf(np.getValue());
+                //Log.v("np", a);
             }
         });
         np2.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                //a2 = String.valueOf(np2.getValue());
+                //String a2 = String.valueOf(np2.getValue());
+                //Log.v("np2", a2);
             }
         });
         np3.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                //a3 = String.valueOf(np3.getValue());
+                //String a3 = String.valueOf(np3.getValue());
+                //Log.v("np3", a3);
             }
         });
         np4.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                //a4 = String.valueOf(np4.getValue());
+                //String a4 = String.valueOf(np4.getValue());
+                //Log.v("np4", a4);
             }
         });
 
@@ -145,12 +112,20 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
             double longitude = gps.getLongitude();
 
             // \n is for new line
-            //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+            Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+            if(debug)
+            Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
         } else {
             // Can't get location.
             // GPS or network is not enabled.
             // Ask user to enable GPS/network in settings.
-            gps.showSettingsAlert();
+            Boolean gpsNag = Client_Functions.getPrefBool("gpsNag", getApplicationContext());
+            if(gpsNag)
+                gps.showSettingsAlert();
+            // only do this once.
+            SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            prefs.putBoolean("gpsNag", false);
+            prefs.commit();
         }
     }
     @Override
@@ -163,12 +138,13 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
         volatile String android_id = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
         double latitude = gps.getLatitude();
         double longitude = gps.getLongitude();
-        String server = getResources().getString(R.string.server_URL);
-        String path = getResources().getString(R.string.script_path);
-        String script = getResources().getString(R.string.script_name);
-        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
-        String userresult = getResources().getString(R.string.userresult);
-        String adminresult = getResources().getString(R.string.adminresult);
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.getPref("script_path", getApplicationContext());
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
+        String userresult = Client_Functions.getPref("userresult", getApplicationContext());
+        String adminresult = Client_Functions.getPref("adminresult", getApplicationContext());
 
         volatile String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
         TelephonyManager telMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
@@ -189,7 +165,7 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
                 try {
                     HttpClient client = new DefaultHttpClient();
                     HttpPost httpPOST = new HttpPost(fullurl);
-                    List<NameValuePair> params = new ArrayList<NameValuePair>();
+                    List<NameValuePair> params = new ArrayList<>();
                     params.add(new BasicNameValuePair("DID", android_id));
                     params.add(new BasicNameValuePair("TelNum", number));
                     params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
@@ -203,7 +179,7 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
                     InputStream content = execute.getEntity().getContent();
 
                     BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                    String s = "";
+                    String s;
                     while ((s = buffer.readLine()) != null) {
                         response += s;
                     }
@@ -235,9 +211,14 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
                 finish();
             }
             else{
-                textView.setText(result);
+                Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+                if(debug)
+                    textView.setText(result);
+                else
+                    textView.setText("Invalid Response From Server");
             }
         }
+
     }
 
 
@@ -283,5 +264,44 @@ public class MainActivity extends ActionBarActivity implements NumberPicker.OnVa
             intent.putExtra("geofence", geofence);
         }
         startActivity(intent);
+    }
+    public void showgatsettings()
+    {
+        final Context context = this;
+        Intent intent = new Intent(context, SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem item1 = menu.findItem(R.id.action_log);
+        item1.setVisible(false);
+        MenuItem item2 = menu.findItem(R.id.action_users);
+        item2.setVisible(false);
+        MenuItem item3 = menu.findItem(R.id.action_devices);
+        item3.setVisible(false);
+
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        //int id = item.getItemId();
+        switch (item.getItemId()){
+            case R.id.action_settings:
+                showgatsettings();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

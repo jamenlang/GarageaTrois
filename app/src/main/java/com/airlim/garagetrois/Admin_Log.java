@@ -1,11 +1,12 @@
 package com.airlim.garagetrois;
 
-/**
- * Created by jlang on 2/27/14.
- */
+
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -20,7 +21,7 @@ import android.widget.ToggleButton;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
+//import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -36,7 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.List;
 //view log
 public class Admin_Log extends Activity {
@@ -44,7 +45,7 @@ public class Admin_Log extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SparseArray<Group> groups = new SparseArray<Group>();
+        //SparseArray<Group> groups = new SparseArray<Group>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin);
         Button b3 = (Button) findViewById(R.id.button3);
@@ -178,22 +179,22 @@ public class Admin_Log extends Activity {
         });
         //createData();
         accessWebService();
-        ExpandableListView listView = (ExpandableListView) findViewById(R.id.listView);
-        MyExpandableListAdapter adapter = new MyExpandableListAdapter(this,
-                groups);
+
+        //ExpandableListView listView = (ExpandableListView) findViewById(R.id.listView);
+        //MyExpandableListAdapter adapter = new MyExpandableListAdapter(this,
+        //        groups);
         //listView.setAdapter(adapter);
         //listView = (ListView) findViewById(R.id.listView1);
         //accessWebService();
     }
 
-
     // Async Task to access the web
     private class JsonReadTask extends AsyncTask<String, Void, String> {
-        String server = getResources().getString(R.string.server_URL);
-        String path = getResources().getString(R.string.script_path);
-        String script = getResources().getString(R.string.script_name);
-        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
-        
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
+
         @Override
         protected String doInBackground(String... urls) {
             //HttpClient httpclient = new DefaultHttpClient();
@@ -204,27 +205,25 @@ public class Admin_Log extends Activity {
                 HttpResponse response = httpclient.execute(httppost);
                 */
                 HttpClient client = new DefaultHttpClient();
+
                 HttpPost httpPOST = new HttpPost(fullurl);
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                List<NameValuePair> params = new ArrayList<>();
 
                 params.add(new BasicNameValuePair("Admin", "viewlog"));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse response = client.execute(httpPOST);
-                jsonResult = inputStreamToString(
-                        response.getEntity().getContent()).toString();
+                jsonResult = inputStreamToString(response.getEntity().getContent()).toString();
             }
 
-            catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
         }
 
         private StringBuilder inputStreamToString(InputStream is) {
-            String rLine = "";
+            String rLine;
             StringBuilder answer = new StringBuilder();
             BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 
@@ -236,6 +235,8 @@ public class Admin_Log extends Activity {
 
             catch (IOException e) {
                 // e.printStackTrace();
+                Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+                if(debug)
                 Toast.makeText(getApplicationContext(),
                         "Error..." + e.toString(), Toast.LENGTH_LONG).show();
             }
@@ -244,23 +245,24 @@ public class Admin_Log extends Activity {
 
         @Override
         protected void onPostExecute(String result) {
-            ListDrwaer();
+            ListDrawer();
         }
     }// end async task
 
     public void accessWebService() {
-        String server = getResources().getString(R.string.server_URL);
-        String path = getResources().getString(R.string.script_path);
-        String script = getResources().getString(R.string.script_name);
-        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
         JsonReadTask task = new JsonReadTask();
+
         // passes values for the urls string array
-        task.execute(new String[] { fullurl });
+        task.execute(fullurl);
     }
 
     // build hash set for list view
-    public void ListDrwaer() {
-        SparseArray<Group> groups = new SparseArray<Group>();
+    public void ListDrawer() {
+        SparseArray<Group> groups = new SparseArray<>();
         try {
             JSONObject jsonResponse = new JSONObject(jsonResult);
             JSONArray jsonMainNode = jsonResponse.optJSONArray("log_info");
@@ -283,6 +285,8 @@ public class Admin_Log extends Activity {
                 groups.append(i, group);
             }
         } catch (JSONException e) {
+            Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+            if(debug)
             Toast.makeText(getApplicationContext(), "Error" + e.toString(),
                     Toast.LENGTH_SHORT).show();
         }
@@ -299,29 +303,29 @@ public class Admin_Log extends Activity {
         listView.setAdapter(simpleAdapter);
         */
     }
-
+    /*
     private HashMap<String, String> createEmployee(String name, String number) {
-        HashMap<String, String> employeeNameNo = new HashMap<String, String>();
+        HashMap<String, String> employeeNameNo = new HashMap<>();
         employeeNameNo.put(name, number);
         return employeeNameNo;
     }
-
+    */
     private class AdminTask extends AsyncTask<String, String, String> {
         TextView textView = (TextView) findViewById(R.id.textView);
         EditText editText = (EditText) findViewById(R.id.editText);
         LinearLayout actionView = (LinearLayout) findViewById(R.id.actionView);
-        String server = getResources().getString(R.string.server_URL);
-        String path = getResources().getString(R.string.script_path);
-        String script = getResources().getString(R.string.script_name);
-        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
+        
         protected String doInBackground(String... urls) {
             String response = "";
-            String adminaction = "";
 
             try {
                 HttpClient client = new DefaultHttpClient();
                 HttpPost httpPOST = new HttpPost(fullurl);
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                List<NameValuePair> params = new ArrayList<>();
                 if (urls[0].length() > 0 && urls[2].length() < 5){
                     params.add(new BasicNameValuePair("Name", urls[0]));
                 }
@@ -341,7 +345,7 @@ public class Admin_Log extends Activity {
                 HttpResponse execute = client.execute(httpPOST);
                 InputStream content = execute.getEntity().getContent();
                 BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                String s = "";
+                String s;
                 while ((s = buffer.readLine()) != null) {
                     response += s;
                 }
@@ -355,6 +359,8 @@ public class Admin_Log extends Activity {
             editText.setText("");
             textView.setText("");
             actionView.setVisibility(View.GONE);
+            Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+            if(debug)
             Toast.makeText(Admin_Log.this, result,
                     Toast.LENGTH_LONG).show();
             accessWebService();

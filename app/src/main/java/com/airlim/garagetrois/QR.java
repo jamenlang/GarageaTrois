@@ -4,22 +4,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.NumberPicker;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -29,7 +19,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -53,10 +42,9 @@ public class QR extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.qrscanned);
         textView = (TextView) findViewById(R.id.textView02);
-        if(!server.equals(null)){
+        if(!server.equals("")){
             SaveServer task = new SaveServer();
             task.execute(server);
-
         }
 
     }
@@ -102,7 +90,7 @@ public class QR extends MainActivity {
 
             HttpClient client = new DefaultHttpClient();
             HttpPost httpPOST = new HttpPost(server);
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("initialtest", "true"));
             params.add(new BasicNameValuePair("DID", android_id));
             params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
@@ -114,7 +102,7 @@ public class QR extends MainActivity {
                 HttpResponse execute = client.execute(httpPOST);
                 InputStream content = execute.getEntity().getContent();
                 BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                String s = "";
+                String s;
                 while ((s = buffer.readLine()) != null) {
                     response += s;
                 }

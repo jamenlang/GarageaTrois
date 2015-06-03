@@ -1,29 +1,26 @@
 package com.airlim.garagetrois;
 
-import android.app.Activity;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.v4.app.Fragment;
+//import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
+//import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+//import android.view.ViewGroup;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import com.airlim.garagetrois.MainActivity;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -70,14 +67,16 @@ public class Control extends MainActivity {
             double longitude = gps.getLongitude();
             if(geofence.equals("true")){
                 textView.setText("Geofence Enabled: GPS Ready.");
-                if(String.valueOf(latitude) == "0.0"){
+                if(String.valueOf(latitude).equals("0.0")){
                     textView.setText("Geofence Enabled: GPS Empty.");
                 }
             }
 
             Log.v("geofence",geofence);
             // \n is for new line
-            //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+            Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+            if(debug)
+            Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
         } else {
             // Can't get location.
             // GPS or network is not enabled.
@@ -96,7 +95,7 @@ public class Control extends MainActivity {
                 tb.setEnabled(!tb.isEnabled());
                 tb.setChecked(!tb.isChecked());
                 ControlTask task = new ControlTask();
-                task.execute(new String[] {"Light"});
+                task.execute("Light");
 
             }
         });
@@ -109,7 +108,7 @@ public class Control extends MainActivity {
                 tb.setEnabled(!tb.isEnabled());
                 tb.setChecked(!tb.isChecked());
                 ControlTask task = new ControlTask();
-                task.execute(new String[]{"Door"});
+                task.execute("Door");
             }
         });
         b4.setOnClickListener(new View.OnClickListener()
@@ -121,7 +120,7 @@ public class Control extends MainActivity {
                 tb.setEnabled(!tb.isEnabled());
                 tb.setChecked(!tb.isChecked());
                 ControlTask task = new ControlTask();
-                task.execute(new String[]{"Lock"});
+                task.execute("Lock");
             }
 
         });
@@ -134,7 +133,8 @@ public class Control extends MainActivity {
     }
 
     public class LoadData extends AsyncTask<Void, Void, Void> {
-        Integer sleepytime = Integer.parseInt(getResources().getString(R.string.sleepytime));
+        Integer sleepytime = Client_Functions.getPrefInt("sleepytime", getApplicationContext()) * 10;
+
         ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
         TextView textView = (TextView) findViewById(R.id.textView02);
         ProgressBar myProgress = (ProgressBar) findViewById(R.id.progressBar);
@@ -153,7 +153,6 @@ public class Control extends MainActivity {
             {
                 try {
                     Thread.sleep(sleepytime);
-                    //my door takes exactly 11.4 seconds to open and close.
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -189,6 +188,7 @@ public class Control extends MainActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (admind.equals("true")){
+            Log.d(admind, "admind");
             // Inflate the menu; this adds items to the action bar if it is present.
             getMenuInflater().inflate(R.menu.main, menu);
             return true;
@@ -196,7 +196,17 @@ public class Control extends MainActivity {
         else
             return false;
     }
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem item1 = menu.findItem(R.id.action_log);
+        item1.setVisible(true);
+        MenuItem item2 = menu.findItem(R.id.action_users);
+        item2.setVisible(true);
+        MenuItem item3 = menu.findItem(R.id.action_devices);
+        item3.setVisible(true);
 
+        return true;
+    }
     @Override
     public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
         super.onValueChange(picker, oldVal, newVal);
@@ -207,7 +217,7 @@ public class Control extends MainActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        //int id = item.getItemId();
         switch (item.getItemId()){
         case R.id.action_log:
             show_log();
@@ -218,6 +228,9 @@ public class Control extends MainActivity {
         case R.id.action_devices:
              show_devices();
              return true;
+        case R.id.action_settings:
+            show_settings();
+            return true;
         default:
             return super.onOptionsItemSelected(item);
         }
@@ -226,6 +239,7 @@ public class Control extends MainActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
+    /*
     public static class PlaceholderFragment extends Fragment {
 
         public PlaceholderFragment() {
@@ -238,16 +252,16 @@ public class Control extends MainActivity {
             return rootView;
         }
     }
-
+*/
     private class ControlTask extends AsyncTask<String, String, String> {
         double latitude = gps.getLatitude();
         double longitude = gps.getLongitude();
         volatile String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         volatile String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
-        String server = getResources().getString(R.string.server_URL);
-        String path = getResources().getString(R.string.script_path);
-        String script = getResources().getString(R.string.script_name);
-        String fullurl = "http://"+server+((path != "")?"/"+path+"/"+script : script);
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
 
 
         public String getDeviceName() {
@@ -260,7 +274,7 @@ public class Control extends MainActivity {
             }
         }
 
-
+        /*
         private String capitalize(String s) {
             if (s == null || s.length() == 0) {
                 return "";
@@ -272,6 +286,7 @@ public class Control extends MainActivity {
                 return Character.toUpperCase(first) + s.substring(1);
             }
         }
+        */
         protected String doInBackground(String... urls) {
             String response = "";
 
@@ -279,7 +294,7 @@ public class Control extends MainActivity {
                 try {
                     HttpClient client = new DefaultHttpClient();
                     HttpPost httpPOST = new HttpPost(fullurl);
-                    List<NameValuePair> params = new ArrayList<NameValuePair>();
+                    List<NameValuePair> params = new ArrayList<>();
                     params.add(new BasicNameValuePair("UID", uid));
                     params.add(new BasicNameValuePair("DID", android_id));
                     params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
@@ -292,7 +307,7 @@ public class Control extends MainActivity {
                     HttpResponse execute = client.execute(httpPOST);
                     InputStream content = execute.getEntity().getContent();
                     BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                    String s = "";
+                    String s;
                     while ((s = buffer.readLine()) != null) {
                         response += s;
                     }
@@ -303,30 +318,37 @@ public class Control extends MainActivity {
             return response;
         }
         protected void onPostExecute(String result) {
-            if(result.equals("Door toggled")){
-                LoadData task = new LoadData();
-                task.execute();
-            }
-            if(result.equals("Light toggled")){
-                ToggleButton b3 = (ToggleButton) findViewById(R.id.button3);
-                b3.setEnabled(!b3.isEnabled());
-                b3.setChecked(!b3.isChecked());
-                textView.setText(result);
-            }
-            if(result.equals("Lock toggled")){
-                ToggleButton b4 = (ToggleButton) findViewById(R.id.button4);
-                b4.setEnabled(!b4.isEnabled());
-                b4.setChecked(!b4.isChecked());
-                textView.setText(result);
-            }
-            if(result.equals("Log in")){
-                finish();
-            }
-            else{
-                textView.setText(result);
+            switch (result) {
+                case "Door toggled":
+                    LoadData task = new LoadData();
+                    task.execute();
+                    break;
+                case "Light toggled":
+                    ToggleButton b3 = (ToggleButton) findViewById(R.id.button3);
+                    b3.setEnabled(!b3.isEnabled());
+                    b3.setChecked(!b3.isChecked());
+                    textView.setText(result);
+                    break;
+                case "Lock toggled":
+                    ToggleButton b4 = (ToggleButton) findViewById(R.id.button4);
+                    b4.setEnabled(!b4.isEnabled());
+                    b4.setChecked(!b4.isChecked());
+                    textView.setText(result);
+                    break;
+                case "Log in":
+                    finish();
+                    break;
+                default:
+                    Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+                    if(debug) {
+                        textView.setText(result);
+                        finish();
+                    }else{
+                        textView.setText("Invalid Response From Server");
+                        finish();
+                    }
             }
         }
-
     }
     public void show_users()
     {
@@ -352,6 +374,12 @@ public class Control extends MainActivity {
         }
         startActivity(intent);
     }
+
+    public void show_settings()
+    {
+        showgatsettings();
+    }
+
     public void show_log()
     {
         final Context context = this;

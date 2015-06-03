@@ -6,13 +6,21 @@
     <item android:id="@+id/action_log"
         android:title="@string/action_log"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:showAsAction="never"
+        />
     <item android:id="@+id/action_users"
         android:title="@string/action_users"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:showAsAction="never"
+        />
     <item android:id="@+id/action_devices"
         android:title="@string/action_devices"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:showAsAction="never"
+        />
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        />
 </menu>

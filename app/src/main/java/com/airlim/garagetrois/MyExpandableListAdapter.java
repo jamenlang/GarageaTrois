@@ -1,21 +1,14 @@
 package com.airlim.garagetrois;
 
-/**
- * Created by jlang on 2/27/14.
- */
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
@@ -32,7 +25,6 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
 
     private final SparseArray<Group> groups;
     public LayoutInflater inflater;
-    private Context context;
     public Activity activity;
     public Integer allexpanded = 0;
     public MyExpandableListAdapter(Activity act, SparseArray<Group> groups) {
@@ -58,7 +50,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         final Group group = (Group) getGroup(groupPosition);
         final String username = group.string;
         final TextView toggleTextView = (TextView) activity.findViewById(R.id.toggleTextView);
-        TextView text = null;
+        TextView text;
         final ToggleButton toggleButton = (ToggleButton) activity.findViewById(R.id.button2);
         final EditText editText = (EditText) activity.findViewById(R.id.editText);
         final TextView textView = (TextView) activity.findViewById(R.id.textView);
@@ -67,7 +59,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         final TextView checkTextView = (TextView) activity.findViewById(R.id.checkTextView);
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.listrow_details, null);
+            convertView = inflater.inflate(R.layout.listrow_details,parent,false);
         }
 
         text = (TextView) convertView.findViewById(R.id.textView1);
@@ -87,10 +79,10 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         else if(children.equals("Allowed: 0")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.denied, 0, 0, 0);
         }
-        else if(children.equals("Has NFC: true")){
+        else if(children.equals("Has NFC: 1")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.nfc, 0, 0, 0);
         }
-        else if(children.equals("Has NFC: false")){
+        else if(children.equals("Has NFC: 0")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.denied, 0, 0, 0);
         }
         else if(children.contains("null")){
@@ -178,8 +170,8 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                         String name_regex ="^User:\\s([A-Za-z0-9]+)\\(";
                         Matcher name_matcher = Pattern.compile(name_regex).matcher(children);
                         String name_result = null;
-                        String aname_result = null;
-                        String bname_result = null;
+                        String aname_result;
+                        String bname_result;
                         if (name_matcher.find( ))
                         {
                             name_result = name_matcher.group(1);
@@ -199,7 +191,6 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                         editText.setVisibility(View.VISIBLE);
                         checkBox.setChecked(false);
                         checkTextView.setVisibility(View.INVISIBLE);
-                        checkTextView.setVisibility(View.INVISIBLE);
                         actionView.setVisibility(View.VISIBLE);
                     }
                     else
@@ -211,13 +202,12 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                         checkTextView.setVisibility(View.VISIBLE);
                         editText.setVisibility(View.INVISIBLE);
                         checkBox.setChecked(false);
-                        checkBox.setChecked(false);
                         actionView.setVisibility(View.VISIBLE);
                     }
                 }
                 else if(children.startsWith("DID: ")){
                     toggleButton.setChecked(false);
-                    String regex ="[a-z0-9]{10,}$";
+                    String regex ="[a-zA-Z0-9]{10,}$";
                     Matcher matcher = Pattern.compile(regex).matcher(children);
                     if (matcher.find( ))
                     {
@@ -258,7 +248,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                         Log.v("pin", pin_result);
                     }
                     else{
-                        Log.v("pinnotfound", pin_result);
+                        Log.v("pin","pinnotfound");
                     }
                     //textView.setText("Select an action to perform or select another item");
                     editText.setText(pin_result);
@@ -271,8 +261,8 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                 }
                 else if(children.startsWith("Geo: ")){
                     String regex ="(\\-?(\\d+\\.\\d+)?),\\s*(\\-?\\d+(\\.\\d+)?)$";
-                    String latitude = null;
-                    String longitude = null;
+                    String latitude;
+                    String longitude;
                     Matcher matcher = Pattern.compile(regex).matcher(children);
                     if (matcher.find( ))
                     {
@@ -294,7 +284,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                     }
                     else
                     {
-                        Toast.makeText(activity, " Not valid latitude or longitude",1000 ).show();
+                        Toast.makeText(activity, " Not valid latitude or longitude",Toast.LENGTH_LONG ).show();
                         System.out.println("not valid lat/lon");
                     }
                 }
@@ -350,7 +340,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         final ToggleButton b2 = (ToggleButton) activity.findViewById(R.id.button2);
         final LinearLayout actionView = (LinearLayout) activity.findViewById(R.id.actionView);
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.listrow_group, null);
+            convertView = inflater.inflate(R.layout.listrow_group, parent,false);
         }
 
 
@@ -361,48 +351,54 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
             actionView.setVisibility(View.GONE);
         }
 ///////i'm trying to hide the adminview linear layout hererererererere
-        if(group.children.equals("Action: ")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
+        switch(group.children.toString()){
+            case "Action: ":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
+                break;
+            case "Action: Denied":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
+                break;
+            case "Action: Granted":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.good, 0, 0, 0);
+                break;
+            case "Has NFC: 1":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.good, 0, 0, 0);
+                break;
+            case "Has NFC: 0":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
+                break;
+            case "Action: Denied (Device)":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
+                break;
+            case "Action: Denied (Device listed as NFC Only)":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
+                break;
+            case "Action: Denied ()":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
+                break;
+            case "Action: Admin Granted":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.good, 0, 0, 0);
+                break;
+            case "Allowed: 1":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.good, 0, 0, 0);
+                break;
+            case "Allowed: 0":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
+                break;
+            case "Action: Door":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.door, 0, 0, 0);
+                break;
+            case "Action: Light":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.light, 0, 0, 0);
+                break;
+            case "Action: Lock":
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.lock, 0, 0, 0);
+                break;
+            default:
+                ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                break;
         }
-        else if(group.children.contains("Action: Denied")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
-        }
-        else if(group.children.contains("Action: Granted")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.good, 0, 0, 0);
-        }
-        else if(group.children.contains("null")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.question, 0, 0, 0);
-        }
-        else if(group.children.contains("Action: Denied (Device)")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
-        }
-        else if(group.children.contains("Action: Denied (Device listed as NFC Only)")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
-        }
-        else if(group.children.contains("Action: Denied ()")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
-        }
-        else if(group.children.contains("Action: Admin Granted")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.good, 0, 0, 0);
-        }
-        else if(group.children.contains("Allowed: 1")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.good, 0, 0, 0);
-        }
-        else if(group.children.contains("Allowed: 0")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.bad, 0, 0, 0);
-        }
-        else if(group.children.contains("Action: Door")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.door, 0, 0, 0);
-        }
-        else if(group.children.contains("Action: Light")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.light, 0, 0, 0);
-        }
-        else if(group.children.contains("Action: Lock")){
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(R.drawable.lock, 0, 0, 0);
-        }
-        else{
-            ((CheckedTextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-        }
+
         /*
         if(group.string.endsWith(":Denied")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.light, 0, 0, 0);
