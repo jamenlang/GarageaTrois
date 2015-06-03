@@ -274,7 +274,10 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        Boolean disablesettings = Client_Functions.getPrefBool("disablesettings", getApplicationContext());
+        if(!disablesettings) {
+            getMenuInflater().inflate(R.menu.main, menu);
+        }
         return true;
     }
 

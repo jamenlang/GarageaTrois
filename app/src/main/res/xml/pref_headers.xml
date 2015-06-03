@@ -5,9 +5,10 @@
     <header android:fragment="com.airlim.garagetrois.SettingsActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_communication_settings" />
     -->
+    <!--
     <header android:fragment="com.airlim.garagetrois.SettingsActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_general" />
-
+    -->
     <header
         android:fragment="com.airlim.garagetrois.SettingsActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_server_settings" />

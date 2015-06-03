@@ -35,4 +35,6 @@
     <string name="pref_default_adminresult">taco</string>
     <string name="pref_header_authentication_settings">Authentication Settings</string>
     <string name="pref_header_server_settings">Server Settings</string>
+    <string name="pref_header_other_settings">Other Settings</string>
+    <string name="pref_description_debug">Enable toast messages and raw HTML output to be displayed</string>
 </resources>
