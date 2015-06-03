@@ -30,4 +30,5 @@
     <string name="wait_for_server">Waiting for server&#8230;</string>
     <string name="pref_title_debug">Debug</string>
     <string name="action_settings">Settings</string>
+    <string name="pref_description_disablesettings">Disable access to this menu, this can be reverted by clearing app data.</string>
 </resources>
