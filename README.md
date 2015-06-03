@@ -5,7 +5,7 @@ If viewing on GitHub use RAW to see the code formatting.
 Android App Client for GarageaTrois Server
 
 If compiling yourself:
-Edit the following values in /app/src/main/res/values/strings.xml
+Edit the following values in /app/src/main/res/xml/pref_server_settings.xml
 
 '<string name="server_URL">YOUR-SERVER-URL-OR-IP</string>'
 e.g. tocos.com or backstreetboysrule.net
