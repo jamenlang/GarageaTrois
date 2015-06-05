@@ -38,6 +38,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -55,11 +57,16 @@ public class Client_Functions extends Context {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         String sleepytime = preferences.getString(key, "11.0");
-        Log.v("preference", sleepytime);
-        //return Integer.parseInt(String.valueOf(Double.longBitsToDouble(preferences.getLong(key, Double.doubleToLongBits(11.0)))));
-        if (sleepytime != null) {
-            sleepytime = sleepytime.split("\\.", 2)[0];
-            sleepytime = sleepytime.replace(".", "");
+
+        if(sleepytime.contains(".")){
+            String[] numbers = sleepytime.split("\\.");
+            Log.v("preference", numbers[0]);
+            Log.v("preference", numbers[1].substring(0,1));
+            sleepytime = numbers[0] + numbers[1].substring(0,1);
+            Log.v("preference", sleepytime);
+        }
+        else {
+            sleepytime = sleepytime + "0";
         }
 
         return Integer.parseInt(sleepytime);
