@@ -133,7 +133,7 @@ public class Control extends MainActivity {
     }
 
     public class LoadData extends AsyncTask<Void, Void, Void> {
-        Integer sleepytime = Client_Functions.getPrefInt("sleepytime", getApplicationContext()) * 10;
+        Integer sleepytime = Client_Functions.getPrefInt("sleepytime", getApplicationContext());
 
         ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
         TextView textView = (TextView) findViewById(R.id.textView02);

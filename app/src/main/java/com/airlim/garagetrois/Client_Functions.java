@@ -53,8 +53,16 @@ public class Client_Functions extends Context {
 
     public static int getPrefInt(String key, Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Log.v("preference", preferences.getString(key, "no key"));
-        return Integer.parseInt(preferences.getString(key, "110"));
+
+        String sleepytime = preferences.getString(key, "11.0");
+        Log.v("preference", sleepytime);
+        //return Integer.parseInt(String.valueOf(Double.longBitsToDouble(preferences.getLong(key, Double.doubleToLongBits(11.0)))));
+        if (sleepytime != null) {
+            sleepytime = sleepytime.split("\\.", 2)[0];
+            sleepytime = sleepytime.replace(".", "");
+        }
+
+        return Integer.parseInt(sleepytime);
     }
 
     public static boolean getPrefBool(String key, Context context) {
