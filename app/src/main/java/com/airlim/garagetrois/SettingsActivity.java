@@ -208,8 +208,75 @@ public class SettingsActivity extends PreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
+            //bindPreferenceSummaryToValue(findPreference("example_text"));
+            //bindPreferenceSummaryToValue(findPreference("example_list"));
+
         }
+    }
+    public static class ServerPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_server_settings);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            //bindPreferenceSummaryToValue(findPreference("example_text"));
+            //bindPreferenceSummaryToValue(findPreference("example_list"));
+            bindPreferenceSummaryToValue(findPreference("server_URL"));
+            bindPreferenceSummaryToValue(findPreference("script_path"));
+            bindPreferenceSummaryToValue(findPreference("script_name"));
+            bindPreferenceSummaryToValue(findPreference("sleepytime"));
+        }
+    }
+    public static class AuthenticationPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_authentication_settings);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            //bindPreferenceSummaryToValue(findPreference("example_text"));
+            //bindPreferenceSummaryToValue(findPreference("example_list"));
+
+        }
+    }
+    public static class OtherPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_other_settings);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            //bindPreferenceSummaryToValue(findPreference("example_text"));
+            //bindPreferenceSummaryToValue(findPreference("example_list"));
+
+        }
+    }
+
+    private final String[] FRAGMENTS = {
+            "com.airlim.garagetrois.SettingsActivity$GeneralPreferenceFragment",
+            "com.airlim.garagetrois.SettingsActivity$ServerPreferenceFragment",
+            "com.airlim.garagetrois.SettingsActivity$AuthenticationPreferenceFragment",
+            "com.airlim.garagetrois.SettingsActivity$OtherPreferenceFragment"
+    };
+
+    @Override
+    protected boolean isValidFragment(String fragmentName) {
+
+        for (String FRAGMENT : FRAGMENTS) {
+            if (FRAGMENT.equals(fragmentName)) {
+                return true;
+            }
+        }
+        return super.isValidFragment(fragmentName);
     }
 }
