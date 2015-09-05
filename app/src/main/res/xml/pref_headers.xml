@@ -10,12 +10,12 @@
         android:title="@string/pref_header_general" />
     -->
     <header
-        android:fragment="com.airlim.garagetrois.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="com.airlim.garagetrois.SettingsActivity$ServerPreferenceFragment"
         android:title="@string/pref_header_server_settings" />
 
-    <header android:fragment="com.airlim.garagetrois.SettingsActivity$GeneralPreferenceFragment"
+    <header android:fragment="com.airlim.garagetrois.SettingsActivity$AuthenticationPreferenceFragment"
         android:title="@string/pref_header_authentication_settings" />
 
-    <header android:fragment="com.airlim.garagetrois.SettingsActivity$GeneralPreferenceFragment"
+    <header android:fragment="com.airlim.garagetrois.SettingsActivity$OtherPreferenceFragment"
         android:title="@string/pref_header_other_settings" />
 </preference-headers>
