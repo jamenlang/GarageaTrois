@@ -1,11 +1,17 @@
 package com.airlim.garagetrois;
 
-
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
+import android.text.method.TransformationMethod;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -44,9 +50,12 @@ import static junit.framework.Assert.assertEquals;
 //view users
 public class Admin_Users extends Activity {
     private String jsonResult;
+    volatile String uid = "0000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Intent intent = getIntent();
+        uid = intent.getStringExtra("uid");
         //SparseArray<Group> groups = new SparseArray<Group>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin);
@@ -72,14 +81,15 @@ public class Admin_Users extends Activity {
                 temp2 = textView.getText().toString();
                 if(editText.getText().toString().length() == 4 && isNumeric(editText.getText().toString()))
                 {
-                    //edittext has the pin in it. the checkbox should be unchecked and say 'edit name' next to it.
+                    //edittext has the uid in it. the checkbox should be unchecked and say 'edit name' next to it.
                     if (buttonView.isChecked()) {
 
                         Toast.makeText(Admin_Users.this, "Modify Name where UID=" + temp1,
                                 Toast.LENGTH_SHORT).show();
                         textView.setText(temp1);
                         editText.setText(temp2);
-                        c1.setText("Edit PIN");
+                        editText.setInputType(InputType.TYPE_CLASS_TEXT);
+                        c1.setText("Edit UID");
 
                     }
                 }
@@ -91,6 +101,7 @@ public class Admin_Users extends Activity {
                                 Toast.LENGTH_SHORT).show();
                         textView.setText(temp1);
                         editText.setText(temp2);
+                        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
                         c1.setText("Edit Name");
                         c1.setChecked(false);
                     }
@@ -118,7 +129,7 @@ public class Admin_Users extends Activity {
                 EditText editText = (EditText) findViewById(R.id.editText);
                 ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
                 CheckBox c1 = (CheckBox) findViewById(R.id.checkBox);
-                String change = (c1.isChecked()) ? "change_name" : "change_pin";
+                String change = (c1.isChecked()) ? "change_name" : "change_uid";
                 String adminaction = (b2.isChecked() ? b2.getTextOff().toString() : b2.getTextOn().toString());
                 if (adminaction.length() > 5)
                     adminaction = adminaction.substring(0, adminaction.length() - 1);
@@ -126,91 +137,91 @@ public class Admin_Users extends Activity {
                 //if textview is empty then stop the button from being pressed.
                 if (editText.getVisibility() == View.VISIBLE) {
                     if (!textView.getText().toString().equals("")) {
-                        Log.v("shit", change);
-                        //edittext is shown, there has to be a PIN to do anything from here.
-                        if (change.equals("change_pin")){
-                            String pin = editText.getText().toString();
-                            String name = textView.getText().toString();
-                            Log.v("shit", "we're changing the pin");
-                            //we're changing the pin
-                            if (pin.length() == 4){
-                                if (!name.contains(" ")) {
-                                    if (!name.equals("")){
-                                        //the pin is 4 chars, textview is not empty and it doesn't contain spaces
+                        Log.v("alright", change);
+                        //edittext is shown, there has to be a UID to do anything from here.
+                        if (change.equals("change_uid")){
+                            String cuid = editText.getText().toString();
+                            String cname = textView.getText().toString();
+                            Log.v("alright", "we're changing the uid");
+                            //we're changing the uid
+                            if (cuid.length() == 4){
+                                if (!cname.contains(" ")) {
+                                    if (!cname.equals("")){
+                                        //the uid is 4 chars, textview is not empty and it doesn't contain spaces
                                         AdminTask task = new AdminTask();
-                                        task.execute(name, pin, change, adminaction);
+                                        task.execute(cname, cuid, change, adminaction);
 
-                                        Toast.makeText(Admin_Users.this, adminaction + "ing privileges for " + name + " (" + pin + ")",
+                                        Toast.makeText(Admin_Users.this, adminaction + "ing privileges for " + cname + " (" + cuid + ")",
                                             Toast.LENGTH_LONG).show();
                                         if (editText.getText().length() == 4 && isNumeric(editText.getText().toString())){
                                             c1.setChecked(false);
                                             c1.setText("Edit Name");
-                                            Log.v("shit", "edit name");
+                                            Log.v("alright", "edit name");
                                         }
                                         else{
                                             c1.setChecked(false);
-                                            Log.v("shit", "edit PIN");
-                                            c1.setText("Edit PIN");
+                                            Log.v("alright", "edit UID");
+                                            c1.setText("Edit UID");
                                         }
                                     } else {
-                                        Log.v("shit", "textview is fancy. kill it");
+                                        Log.v("notalright", "textview is fancy. kill it");
                                         //text in textview is fancy. kill it.
                                         Toast.makeText(Admin_Users.this, "User names cannot cannot be blank.",
                                             Toast.LENGTH_LONG).show();
                                     }
                                 } else {
                                     //text in textview is fancy. kill it.
-                                    Log.v("shit", "textview is fancy. kill it");
+                                    Log.v("notalright", "textview is fancy. kill it");
                                     Toast.makeText(Admin_Users.this, "User names cannot contain spaces.",
                                             Toast.LENGTH_LONG).show();
                                 }
                             } else {
-                                //this doesn't look like a PIN...
-                                Log.v("shit", "this doesn't look like a PIN");
-                                Toast.makeText(Admin_Users.this, "PINs must be 4 digits",
+                                //this doesn't look like a UID...
+                                Log.v("notalright", "this doesn't look like a UID");
+                                Toast.makeText(Admin_Users.this, "UIDs must be 4 digits",
                                         Toast.LENGTH_LONG).show();
                              }
 
                         } else if (change.equals("change_name")){
-                            String name = editText.getText().toString();
-                            String pin = textView.getText().toString();
-                            Log.v("shit changename", "we're changing the name");
+                            String cname = editText.getText().toString();
+                            String cuid = textView.getText().toString();
+                            Log.v("alright", "we're changing the name");
                             //we're changing the name
-                            if (pin.length() == 4){
-                                if (!name.contains(" ")) {
-                                    if (!name.equals("")){
-                                        //the pin is 4 chars, textview is not empty and it doesn't contain spaces
+                            if (cuid.length() == 4){
+                                if (!cname.contains(" ")) {
+                                    if (!cname.equals("")){
+                                        //the uid is 4 chars, textview is not empty and it doesn't contain spaces
                                         AdminTask task = new AdminTask();
-                                        task.execute(name, pin, change, adminaction);
+                                        task.execute(cname, cuid, change, adminaction);
 
-                                        Toast.makeText(Admin_Users.this, adminaction + "ing privileges for " + name + " (" + pin + ")",
+                                        Toast.makeText(Admin_Users.this, adminaction + "ing privileges for " + cname + " (" + cuid + ")",
                                                 Toast.LENGTH_LONG).show();
                                         if (editText.getText().length() == 4 && isNumeric(editText.getText().toString())){
                                             c1.setChecked(false);
-                                            Log.v("shit changename", "edit name");
+                                            Log.v("alright", "edit name");
                                             c1.setText("Edit Name");
                                         }
                                         else{
                                             c1.setChecked(false);
-                                            Log.v("shit changename", "edit pin");
-                                            c1.setText("Edit PIN");
+                                            Log.v("alright", "edit uid");
+                                            c1.setText("Edit UID");
                                         }
                                     } else {
                                         //text in textview is fancy. kill it.
-                                        Log.v("shit changename", "textview is fancy");
+                                        Log.v("notalright", "textview is fancy");
                                         Toast.makeText(Admin_Users.this, "User names cannot cannot be blank.",
                                                 Toast.LENGTH_LONG).show();
                                     }
                                 } else {
                                     //text in textview is fancy. kill it.
-                                    Log.v("shit changename", "textview is fancy 2");
+                                    Log.v("changename", "textview is fancy 2");
                                     Toast.makeText(Admin_Users.this, "User names cannot contain spaces.",
                                             Toast.LENGTH_LONG).show();
                                 }
                             } else {
-                                //this doesn't look like a PIN...
-                                Log.v("shit changename", "this doesn't look like a PIN");
-                                Toast.makeText(Admin_Users.this, "PINs must be 4 digits",
+                                //this doesn't look like a UID...
+                                Log.v("changename", "this doesn't look like a UID");
+                                Toast.makeText(Admin_Users.this, "UIDs must be 4 digits",
                                         Toast.LENGTH_LONG).show();
                             }
                         }
@@ -222,17 +233,9 @@ public class Admin_Users extends Activity {
                 Log.v("textviewlength", String.valueOf(textView.getText().toString().length()));
             }
         });
-        //createData();
         accessWebService();
-        //ExpandableListView listView = (ExpandableListView) findViewById(R.id.listView);
-        //MyExpandableListAdapter adapter = new MyExpandableListAdapter(this,
-        //        groups);
-        //listView.setAdapter(adapter);
-        //listView = (ListView) findViewById(R.id.listView1);
-        //accessWebService();
     }
 
-    // Async Task to access the web
     public boolean isNumeric(String s) {
         return s.matches("[-+]?\\d*\\.?\\d+");
     }
@@ -243,18 +246,17 @@ public class Admin_Users extends Activity {
         String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
         @Override
         protected String doInBackground(String... urls) {
-            //HttpClient httpclient = new DefaultHttpClient();
 
-            //HttpPost httppost = new HttpPost(params[0]);
-            try {
-                /*
-                HttpResponse response = httpclient.execute(httppost);
-                */
+            try{
                 HttpClient client = new DefaultHttpClient();
                 HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<>();
 
                 params.add(new BasicNameValuePair("Admin", "viewusers"));
+                params.add(new BasicNameValuePair("UID", uid));
+                params.add(new BasicNameValuePair("DID", getAndroid_id()));
+                params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
+                params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse response = client.execute(httpPOST);
@@ -301,12 +303,10 @@ public class Admin_Users extends Activity {
         String script = Client_Functions.getPref("script_name", getApplicationContext());
         String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
         JsonReadTask task = new JsonReadTask();
-        // passes values for the urls string array
 
         task.execute(fullurl);
     }
 
-    // build hash set for list view
     public void ListDrawer() {
         SparseArray<Group> groups = new SparseArray<>();
         try {
@@ -315,14 +315,10 @@ public class Admin_Users extends Activity {
 
             for (int i = 0; i < jsonMainNode.length(); i++) {
                 JSONObject jsonChildNode = jsonMainNode.getJSONObject(i);
-                //String name = jsonChildNode.optString("name");
-                Group group = new Group(jsonChildNode.optString("name"));// + ":" + jsonChildNode.optString("action")
+                Group group = new Group(jsonChildNode.optString("name"));
                 group.children.add("Allowed: " + jsonChildNode.optString("allowed"));
-                group.children.add("PIN: " + jsonChildNode.optString("uid"));
+                group.children.add("UID: " + jsonChildNode.optString("uid"));
                 group.children.add("Last updated: " + jsonChildNode.optString("date"));
-                //String outPut = did + " : " + action;
-                //employeeList.add(createEmployee("employees", outPut));
-                //Log.v("group", groups.toString());
                 groups.append(i, group);
             }
         } catch (JSONException e) {
@@ -338,19 +334,25 @@ public class Admin_Users extends Activity {
                 groups);
         listView.setAdapter(adapter);
 
-        /*SimpleAdapter simpleAdapter = new SimpleAdapter(this, employeeList,
-                android.R.layout.simple_list_item_1,
-                new String[] { "employees" }, new int[] { android.R.id.text1 });
-        listView.setAdapter(simpleAdapter);
-        */
     }
-    /*
-    private HashMap<String, String> createEmployee(String name, String number) {
-        HashMap<String, String> employeeNameNo = new HashMap<String, String>();
-        employeeNameNo.put(name, number);
-        return employeeNameNo;
+
+    public String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.startsWith(manufacturer)) {
+            return model;
+        } else {
+            return manufacturer + " " + model;
+        }
     }
-    */
+    public String getNfc_support() {
+        String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
+        return nfc_support;
+    }
+    public String getAndroid_id() {
+        String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        return android_id;
+    }
     private class AdminTask extends AsyncTask<String, String, String> {
         TextView textView = (TextView) findViewById(R.id.textView);
         EditText editText = (EditText) findViewById(R.id.editText);
@@ -367,10 +369,14 @@ public class Admin_Users extends Activity {
                 HttpClient client = new DefaultHttpClient();
                 HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<>();
-                params.add(new BasicNameValuePair("Name", urls[0]));
-                params.add(new BasicNameValuePair("UID", urls[1]));
+                params.add(new BasicNameValuePair("CName", urls[0]));
+                params.add(new BasicNameValuePair("CUID", urls[1]));
                 params.add(new BasicNameValuePair("Change", urls[2]));
                 params.add(new BasicNameValuePair("AdminAction", urls[3]));
+                params.add(new BasicNameValuePair("UID", uid));
+                params.add(new BasicNameValuePair("DID", getAndroid_id()));
+                params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
+                params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse execute = client.execute(httpPOST);
