@@ -4,9 +4,12 @@ package com.airlim.garagetrois;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -42,9 +45,12 @@ import java.util.List;
 //view log
 public class Admin_Log extends Activity {
     private String jsonResult;
+    volatile String uid = "0000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Intent intent = getIntent();
+        uid = intent.getStringExtra("uid");
         //SparseArray<Group> groups = new SparseArray<Group>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin);
@@ -107,7 +113,7 @@ public class Admin_Log extends Activity {
                 EditText editText = (EditText) findViewById(R.id.editText);
                 ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
                 CheckBox c1 = (CheckBox) findViewById(R.id.checkBox);
-                String nfc = (c1.isChecked()) ? "exclusive" : "nonexclusive";
+                String cnfc = (c1.isChecked()) ? "exclusive" : "nonexclusive";
                 String adminaction = (b2.isChecked() ? b2.getTextOff().toString() : b2.getTextOn().toString());
                 if (adminaction.length() > 5)
                     adminaction = adminaction.substring(0, adminaction.length()-1);
@@ -119,16 +125,16 @@ public class Admin_Log extends Activity {
                     {
                         if (textView.getText().toString().length() > 5){
                             //there is a DID set in textview so this is ok.
-                            String name = "";
-                            String did = textView.getText().toString();
+                            String cname = "";
+                            String cdid = textView.getText().toString();
 
 
                             //textView.setText(adminaction + "ing privileges for " + did + " (NFC " + nfc + ")");
                             AdminTask task = new AdminTask();
-                            task.execute(name, nfc, did, adminaction);
+                            task.execute(cname, cnfc, cdid, adminaction);
                             c1.setChecked(false);
 
-                            Toast.makeText(Admin_Log.this, adminaction + "ing privileges for " + did + " (NFC " + nfc + ")",
+                            Toast.makeText(Admin_Log.this, adminaction + "ing privileges for " + cdid + " (NFC " + cnfc + ")",
                                     Toast.LENGTH_LONG).show();
                         }
                         else if(textView.getText().toString().length() < 1){
@@ -138,7 +144,7 @@ public class Admin_Log extends Activity {
                         }
                         else{
                             //this doesn't look like a DID...
-                            Toast.makeText(Admin_Log.this, "What the actual fuck?",
+                            Toast.makeText(Admin_Log.this, "What the hell?",
                                     Toast.LENGTH_LONG).show();
                         }
                     }
@@ -151,13 +157,13 @@ public class Admin_Log extends Activity {
                     //edittext is visible. it has to have something in it to proceed.
                     if(editText.getText().toString().length() > 0 && textView.getText().toString().length() > 0 && textView.getText().toString().length() < 5){
                         //there is text in the edittext and it's not a DID, we should be ok.
-                        String name = editText.getText().toString();
-                        String did = textView.getText().toString();
+                        String cname = editText.getText().toString();
+                        String cdid = textView.getText().toString();
 
                         //textView.setText(adminaction + "ing privileges for " + name + " (" + did + ")");
                         AdminTask task = new AdminTask();
-                        task.execute(name, nfc, did, adminaction);
-                        Toast.makeText(Admin_Log.this, adminaction + "ing privileges for " + name + " (" + did + ")" ,
+                        task.execute(cname, cnfc, cdid, adminaction);
+                        Toast.makeText(Admin_Log.this, adminaction + "ing privileges for " + cname + " (" + cdid + ")" ,
                                 Toast.LENGTH_LONG).show();
                     }
                     else if (textView.getText().toString().contains(" ")){
@@ -177,15 +183,25 @@ public class Admin_Log extends Activity {
                 Log.v("textviewlength", String.valueOf(textView.getText().toString().length()));
             }
         });
-        //createData();
         accessWebService();
 
-        //ExpandableListView listView = (ExpandableListView) findViewById(R.id.listView);
-        //MyExpandableListAdapter adapter = new MyExpandableListAdapter(this,
-        //        groups);
-        //listView.setAdapter(adapter);
-        //listView = (ListView) findViewById(R.id.listView1);
-        //accessWebService();
+    }
+    public String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.startsWith(manufacturer)) {
+            return model;
+        } else {
+            return manufacturer + " " + model;
+        }
+    }
+    public String getNfc_support() {
+        String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
+            return nfc_support;
+    }
+    public String getAndroid_id() {
+        String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        return android_id;
     }
 
     // Async Task to access the web
@@ -197,19 +213,18 @@ public class Admin_Log extends Activity {
 
         @Override
         protected String doInBackground(String... urls) {
-            //HttpClient httpclient = new DefaultHttpClient();
 
-            //HttpPost httppost = new HttpPost(params[0]);
             try {
-                /*
-                HttpResponse response = httpclient.execute(httppost);
-                */
                 HttpClient client = new DefaultHttpClient();
 
                 HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<>();
 
                 params.add(new BasicNameValuePair("Admin", "viewlog"));
+                params.add(new BasicNameValuePair("UID", uid));
+                params.add(new BasicNameValuePair("DID", getAndroid_id()));
+                params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
+                params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse response = client.execute(httpPOST);
@@ -260,7 +275,6 @@ public class Admin_Log extends Activity {
         task.execute(fullurl);
     }
 
-    // build hash set for list view
     public void ListDrawer() {
         SparseArray<Group> groups = new SparseArray<>();
         try {
@@ -279,9 +293,6 @@ public class Admin_Log extends Activity {
                 }
                 group.children.add("User: " + jsonChildNode.optString("name") + "(" + jsonChildNode.optString("uid") + ")");
                 group.children.add("Phone: " + jsonChildNode.optString("number"));
-                //String outPut = did + " : " + action;
-                //employeeList.add(createEmployee("employees", outPut));
-                //Log.v("group", groups.toString());
                 groups.append(i, group);
             }
         } catch (JSONException e) {
@@ -297,20 +308,10 @@ public class Admin_Log extends Activity {
                 groups);
         listView.setAdapter(adapter);
 
-        /*SimpleAdapter simpleAdapter = new SimpleAdapter(this, employeeList,
-                android.R.layout.simple_list_item_1,
-                new String[] { "employees" }, new int[] { android.R.id.text1 });
-        listView.setAdapter(simpleAdapter);
-        */
     }
-    /*
-    private HashMap<String, String> createEmployee(String name, String number) {
-        HashMap<String, String> employeeNameNo = new HashMap<>();
-        employeeNameNo.put(name, number);
-        return employeeNameNo;
-    }
-    */
+
     private class AdminTask extends AsyncTask<String, String, String> {
+
         TextView textView = (TextView) findViewById(R.id.textView);
         EditText editText = (EditText) findViewById(R.id.editText);
         LinearLayout actionView = (LinearLayout) findViewById(R.id.actionView);
@@ -327,19 +328,23 @@ public class Admin_Log extends Activity {
                 HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<>();
                 if (urls[0].length() > 0 && urls[2].length() < 5){
-                    params.add(new BasicNameValuePair("Name", urls[0]));
+                    params.add(new BasicNameValuePair("CName", urls[0]));
                 }
                 if (urls[1].contains("exclusive")){
-                    params.add(new BasicNameValuePair("NFC", urls[1]));
+                    params.add(new BasicNameValuePair("CNFC", urls[1]));
                 }
                 if (urls[2].length() > 5){
-                    params.add(new BasicNameValuePair("DID", urls[2]));
+                    params.add(new BasicNameValuePair("CDID", urls[2]));
                 }
                 else{
-                    params.add(new BasicNameValuePair("UID", urls[2]));
+                    params.add(new BasicNameValuePair("CUID", urls[2]));
                 }
 
                 params.add(new BasicNameValuePair("AdminAction", urls[3]));
+                params.add(new BasicNameValuePair("UID", uid));
+                params.add(new BasicNameValuePair("DID", getAndroid_id()));
+                params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
+                params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse execute = client.execute(httpPOST);
