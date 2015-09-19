@@ -47,7 +47,12 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     volatile String geofence = "false";
     GPSTracker gps;
     public void onBackPressed() {
-        finish();
+        if(textView.getText() == "Log in by entering your PIN") {
+            finish();
+        }
+        else {
+            textView.setText("Log in by entering your PIN");
+        }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
