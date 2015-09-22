@@ -94,16 +94,16 @@
             android:layout_width="fill_parent"
             android:layout_height="59dp"
             android:layout_marginLeft="20dp">
-        <CheckBox
-            android:id="@+id/checkBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textOn="Revoke"
-            android:textOff="Grant"
-            android:visibility="visible"
-            android:text="@string/nfc"
-            android:layout_gravity="center"
-            android:gravity="center" />
+            <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="Revoke"
+                android:textOff="Grant"
+                android:visibility="visible"
+                android:text="@string/nfc_only"
+                android:layout_gravity="center"
+                android:gravity="center" />
 
             <LinearLayout
                 android:orientation="horizontal"

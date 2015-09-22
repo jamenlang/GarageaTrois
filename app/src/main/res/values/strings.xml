@@ -16,7 +16,8 @@
     <string name="enter_comment">Comment</string>
     <string name="edit_text">Name</string>
     <string name="cancel">Cancel</string>
-    <string name="nfc">NFC Only?</string>
+    <string name="nfc_only">NFC Only?</string>
+    <string name="nfc_allowed">NFC Allowed?</string>
     <string name="administer">Go</string>
     <string name="admin_log">Garage à Trois - Access Log</string>
     <string name="admin_devices">Garage à Trois - Device List</string>

@@ -51,20 +51,31 @@ import static junit.framework.Assert.assertEquals;
 public class Admin_Users extends Activity {
     private String jsonResult;
     volatile String uid = "0000";
+    volatile String did = "";
+    volatile String number = "";
+    volatile String admind = "";
+    volatile String devicename = "";
+    volatile String geofence = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
+        admind = intent.getStringExtra("admind");
+        did = intent.getStringExtra("did");
+        devicename = intent.getStringExtra("devicename");
+        number = intent.getStringExtra("number");
+
         //SparseArray<Group> groups = new SparseArray<Group>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin);
         ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
         Button b3 = (Button) findViewById(R.id.button3);
         CheckBox c1 = (CheckBox) findViewById(R.id.checkBox);
+        EditText editText = (EditText) findViewById(R.id.editText);
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         LinearLayout actionView = (LinearLayout) findViewById(R.id.actionView);
         actionView.setVisibility(View.GONE);
-
         c1.setText("Edit Name");
         c1.setVisibility(View.VISIBLE);
 
@@ -178,6 +189,7 @@ public class Admin_Users extends Activity {
                             } else {
                                 //this doesn't look like a UID...
                                 Log.v("notalright", "this doesn't look like a UID");
+                                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
                                 Toast.makeText(Admin_Users.this, "UIDs must be 4 digits",
                                         Toast.LENGTH_LONG).show();
                              }
@@ -197,6 +209,7 @@ public class Admin_Users extends Activity {
                                         Toast.makeText(Admin_Users.this, adminaction + "ing privileges for " + cname + " (" + cuid + ")",
                                                 Toast.LENGTH_LONG).show();
                                         if (editText.getText().length() == 4 && isNumeric(editText.getText().toString())){
+                                            editText.setInputType(InputType.TYPE_CLASS_NUMBER);
                                             c1.setChecked(false);
                                             Log.v("alright", "edit name");
                                             c1.setText("Edit Name");
@@ -219,6 +232,7 @@ public class Admin_Users extends Activity {
                                             Toast.LENGTH_LONG).show();
                                 }
                             } else {
+                                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
                                 //this doesn't look like a UID...
                                 Log.v("changename", "this doesn't look like a UID");
                                 Toast.makeText(Admin_Users.this, "UIDs must be 4 digits",
@@ -254,9 +268,8 @@ public class Admin_Users extends Activity {
 
                 params.add(new BasicNameValuePair("Admin", "viewusers"));
                 params.add(new BasicNameValuePair("UID", uid));
-                params.add(new BasicNameValuePair("DID", getAndroid_id()));
-                params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
-                params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
+                params.add(new BasicNameValuePair("DID", did));
+                params.add(new BasicNameValuePair("DeviceName", devicename));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse response = client.execute(httpPOST);
@@ -336,23 +349,6 @@ public class Admin_Users extends Activity {
 
     }
 
-    public String getDeviceName() {
-        String manufacturer = Build.MANUFACTURER;
-        String model = Build.MODEL;
-        if (model.startsWith(manufacturer)) {
-            return model;
-        } else {
-            return manufacturer + " " + model;
-        }
-    }
-    public String getNfc_support() {
-        String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
-        return nfc_support;
-    }
-    public String getAndroid_id() {
-        String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        return android_id;
-    }
     private class AdminTask extends AsyncTask<String, String, String> {
         TextView textView = (TextView) findViewById(R.id.textView);
         EditText editText = (EditText) findViewById(R.id.editText);
@@ -374,9 +370,8 @@ public class Admin_Users extends Activity {
                 params.add(new BasicNameValuePair("Change", urls[2]));
                 params.add(new BasicNameValuePair("AdminAction", urls[3]));
                 params.add(new BasicNameValuePair("UID", uid));
-                params.add(new BasicNameValuePair("DID", getAndroid_id()));
-                params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
-                params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
+                params.add(new BasicNameValuePair("DID", did));
+                params.add(new BasicNameValuePair("DeviceName", devicename));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse execute = client.execute(httpPOST);

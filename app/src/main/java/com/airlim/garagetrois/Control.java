@@ -37,10 +37,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Control extends MainActivity {
+public class Control extends Login {
     TextView textView;
     volatile String reverse = "false";
     volatile String uid = "0000";
+    volatile String did = "0000";
+    volatile String devicename = "";
+    volatile String number = "";
+    volatile String nfc = "";
     GPSTracker gps;
 
     @Override
@@ -48,6 +52,10 @@ public class Control extends MainActivity {
 
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
+        did = intent.getStringExtra("did");
+        devicename = intent.getStringExtra("devicename");
+        number = intent.getStringExtra("number");
+        nfc = intent.getStringExtra("nfc");
         admind = intent.getStringExtra("admind");
         geofence = intent.getStringExtra("geofence");
         Log.v("geofence",geofence);
@@ -263,30 +271,6 @@ public class Control extends MainActivity {
         String script = Client_Functions.getPref("script_name", getApplicationContext());
         String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
 
-
-        public String getDeviceName() {
-            String manufacturer = Build.MANUFACTURER;
-            String model = Build.MODEL;
-            if (model.startsWith(manufacturer)) {
-                return model;
-            } else {
-                return manufacturer + " " + model;
-            }
-        }
-
-        /*
-        private String capitalize(String s) {
-            if (s == null || s.length() == 0) {
-                return "";
-            }
-            char first = s.charAt(0);
-            if (Character.isUpperCase(first)) {
-                return s;
-            } else {
-                return Character.toUpperCase(first) + s.substring(1);
-            }
-        }
-        */
         protected String doInBackground(String... urls) {
             String response = "";
 
@@ -301,6 +285,7 @@ public class Control extends MainActivity {
                     params.add(new BasicNameValuePair("hasNFC", nfc_support));
                     params.add(new BasicNameValuePair("Latitude", String.valueOf(latitude)));
                     params.add(new BasicNameValuePair("Longitude", String.valueOf(longitude)));
+                    params.add(new BasicNameValuePair("TelNum", number));
                     params.add(new BasicNameValuePair("switch", url));
                     UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                     httpPOST.setEntity(ent);
@@ -355,6 +340,11 @@ public class Control extends MainActivity {
         final Context context = this;
         Intent intent = new Intent(context, Admin_Users.class);
         intent.putExtra("uid", uid);
+        intent.putExtra("geofence", geofence);
+        intent.putExtra("nfc", nfc);
+        intent.putExtra("devicename", devicename);
+        intent.putExtra("did", did);
+        intent.putExtra("number", number);
         if (admind.equals("true"))
             intent.putExtra("admind", "true");
         else{
@@ -367,6 +357,11 @@ public class Control extends MainActivity {
         final Context context = this;
         Intent intent = new Intent(context, Admin_Devices.class);
         intent.putExtra("uid", uid);
+        intent.putExtra("geofence", geofence);
+        intent.putExtra("nfc", nfc);
+        intent.putExtra("devicename", devicename);
+        intent.putExtra("did", did);
+        intent.putExtra("number", number);
         if (admind.equals("true"))
             intent.putExtra("admind", "true");
         else{
@@ -385,6 +380,11 @@ public class Control extends MainActivity {
         final Context context = this;
         Intent intent = new Intent(context, Admin_Log.class);
         intent.putExtra("uid", uid);
+        intent.putExtra("geofence", geofence);
+        intent.putExtra("nfc", nfc);
+        intent.putExtra("devicename", devicename);
+        intent.putExtra("did", did);
+        intent.putExtra("number", number);
         if (admind.equals("true"))
             intent.putExtra("admind", "true");
         else{

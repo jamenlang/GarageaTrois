@@ -47,11 +47,22 @@ import java.util.List;
 public class Admin_Devices extends Activity {
     private String jsonResult;
     volatile String uid = "0000";
+    volatile String did = "";
+    volatile String number = "";
+
+    volatile String admind = "";
+    volatile String devicename = "";
+    volatile String geofence = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
+        admind = intent.getStringExtra("admind");
+        did = intent.getStringExtra("did");
+        devicename = intent.getStringExtra("devicename");
+        number = intent.getStringExtra("number");
+
         //SparseArray<Group> groups = new SparseArray<Group>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin);
@@ -176,23 +187,6 @@ public class Admin_Devices extends Activity {
         accessWebService();
     }
 
-    public String getDeviceName() {
-        String manufacturer = Build.MANUFACTURER;
-        String model = Build.MODEL;
-        if (model.startsWith(manufacturer)) {
-            return model;
-        } else {
-            return manufacturer + " " + model;
-        }
-    }
-    public String getNfc_support() {
-        String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
-        return nfc_support;
-    }
-    public String getAndroid_id() {
-        String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        return android_id;
-    }
     // Async Task to access the web
     private class JsonReadTask extends AsyncTask<String, Void, String> {
         //Functions fullurl = new Functions();
@@ -224,9 +218,8 @@ public class Admin_Devices extends Activity {
                 //need to add a lot more than just this
                 params.add(new BasicNameValuePair("Admin", "viewdevices"));
                 params.add(new BasicNameValuePair("UID", uid));
-                params.add(new BasicNameValuePair("DID", getAndroid_id()));
-                params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
-                params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
+                params.add(new BasicNameValuePair("DID", did));
+                params.add(new BasicNameValuePair("DeviceName", devicename));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse response = client.execute(httpPOST);
@@ -345,8 +338,8 @@ public class Admin_Devices extends Activity {
 
                 params.add(new BasicNameValuePair("AdminAction", urls[3]));
                 params.add(new BasicNameValuePair("UID", uid));
-                params.add(new BasicNameValuePair("DID", getAndroid_id()));
-                params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
+                params.add(new BasicNameValuePair("DID", did));
+                params.add(new BasicNameValuePair("DeviceName", devicename));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse execute = client.execute(httpPOST);

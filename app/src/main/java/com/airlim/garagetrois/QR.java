@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class QR extends MainActivity {
+public class QR extends Login {
     TextView textView;
 
     volatile String server = null;

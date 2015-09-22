@@ -19,7 +19,7 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.widget.Toast;
 
-public class tagsense extends MainActivity implements CreateNdefMessageCallback, OnNdefPushCompleteCallback {
+public class tagsense extends Login implements CreateNdefMessageCallback, OnNdefPushCompleteCallback {
     NfcAdapter mNfcAdapter;
     private static final int MESSAGE_SENT = 1;
 

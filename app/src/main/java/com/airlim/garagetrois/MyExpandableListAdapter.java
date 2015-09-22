@@ -106,7 +106,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         else if(children.contains("Last updated: ")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.calendar, 0, 0, 0);
         }
-        else if(children.startsWith("PIN: ")){
+        else if(children.startsWith("UID: ")){
             text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pin, 0, 0, 0);
         }
         else if(children.startsWith("User: (")){
@@ -236,22 +236,22 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
 
                     }
                 }
-                else if(children.startsWith("PIN: ")){
+                else if(children.startsWith("UID: ")){
                     toggleButton.setChecked(false);
                     toggleTextView.setText("This user will be allowed");
-                    String pin_regex ="^PIN:\\s([0-9]{4})$";
-                    String pin_result = null;
-                    Matcher pin_matcher = Pattern.compile(pin_regex).matcher(children);
-                    if (pin_matcher.find( ))
+                    String uid_regex ="^UID:\\s([0-9]{4})$";
+                    String uid_result = null;
+                    Matcher uid_matcher = Pattern.compile(uid_regex).matcher(children);
+                    if (uid_matcher.find( ))
                     {
-                        pin_result = pin_matcher.group(1);
-                        Log.v("pin", pin_result);
+                        uid_result = uid_matcher.group(1);
+                        Log.v("uid", uid_result);
                     }
                     else{
-                        Log.v("pin","pinnotfound");
+                        Log.v("uid","uidnotfound");
                     }
                     //textView.setText("Select an action to perform or select another item");
-                    editText.setText(pin_result);
+                    editText.setText(uid_result);
                     textView.setText(username);
                     editText.setVisibility(View.VISIBLE);
                     checkTextView.setVisibility(View.INVISIBLE);
