@@ -251,11 +251,7 @@ public class Control extends Login {
     public void runControl(final String app_will_request, final int id) {
         final ToggleButton triggerBtn = (ToggleButton) findViewById(id);
         triggerBtn.setEnabled(false);
-        final String sleepytime_id = "sleepytime_" + id;
-        int sleepytime = Client_Functions.getPrefInt(sleepytime_id, getApplicationContext());
-        if (sleepytime > 0) {
-            runTimer(id);
-        }
+        
         //---new task----
         AsyncTask<String, String, String> task = new AsyncTask<String, String, String>() {
             double latitude = gps.getLatitude();
@@ -293,7 +289,11 @@ public class Control extends Login {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
+                final String sleepytime_id = "sleepytime_" + id;
+                int sleepytime = Client_Functions.getPrefInt(sleepytime_id, getApplicationContext());
+                if (sleepytime > 0) {
+                    runTimer(id);
+                }
                 return response;
             }
 
