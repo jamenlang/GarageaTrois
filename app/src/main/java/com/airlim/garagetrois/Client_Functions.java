@@ -56,7 +56,7 @@ public class Client_Functions extends Context {
     public static int getPrefInt(String key, Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        String sleepytime = preferences.getString(key, "11.0");
+        String sleepytime = preferences.getString(key, "0.0");
 
         if(sleepytime.contains(".")){
             String[] numbers = sleepytime.split("\\.");
