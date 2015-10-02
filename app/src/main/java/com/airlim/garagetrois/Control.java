@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 //import android.support.v4.app.Fragment;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 //import android.view.LayoutInflater;
 import android.util.SparseArray;
@@ -112,6 +113,29 @@ public class Control extends Login {
     public void onBackPressed() {
         finish();
     }
+    public String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.startsWith(manufacturer)) {
+            return model;
+        } else {
+            return manufacturer + " " + model;
+        }
+    }
+
+    public String getNfc_support() {
+        return String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
+
+    }
+
+    public String getAndroid_id() {
+        return Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+    public String getTel_number() {
+        TelephonyManager telMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+        return telMgr.getLine1Number();
+    }
     public void runTimer(final int id){
         final ToggleButton triggerBtn = (ToggleButton) findViewById(id);
         //---new task----
@@ -157,10 +181,11 @@ public class Control extends Login {
                         var++;
                     else
                         var--;
-                    myProgress.setProgress(var);
+                    final int finalVar = var;
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            myProgress.setProgress(finalVar);
                             textView.setText("Waiting...");
                         }
                     });
@@ -235,8 +260,6 @@ public class Control extends Login {
         AsyncTask<String, String, String> task = new AsyncTask<String, String, String>() {
             double latitude = gps.getLatitude();
             double longitude = gps.getLongitude();
-            volatile String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-            volatile String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
             String server = Client_Functions.getPref("server_URL", getApplicationContext());
             String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
             String script = Client_Functions.getPref("script_name", getApplicationContext());
@@ -251,9 +274,9 @@ public class Control extends Login {
                     HttpPost httpPOST = new HttpPost(fullurl);
                     List<NameValuePair> params = new ArrayList<>();
                     params.add(new BasicNameValuePair("UID", uid));
-                    params.add(new BasicNameValuePair("DID", android_id));
+                    params.add(new BasicNameValuePair("DID", getAndroid_id()));
                     params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
-                    params.add(new BasicNameValuePair("hasNFC", nfc_support));
+                    params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
                     params.add(new BasicNameValuePair("Latitude", String.valueOf(latitude)));
                     params.add(new BasicNameValuePair("Longitude", String.valueOf(longitude)));
                     params.add(new BasicNameValuePair("TelNum", number));
@@ -312,6 +335,8 @@ public class Control extends Login {
     }
 
     private class JsonReadTask extends AsyncTask<String, Void, String> {
+        double latitude = gps.getLatitude();
+        double longitude = gps.getLongitude();
         String server = Client_Functions.getPref("server_URL", getApplicationContext());
         String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
         String script = Client_Functions.getPref("script_name", getApplicationContext());
@@ -327,7 +352,14 @@ public class Control extends Login {
                 List<NameValuePair> params = new ArrayList<>();
 
                 params.add(new BasicNameValuePair("retrieve", "switch_info"));
-
+                params.add(new BasicNameValuePair("UID", uid));
+                params.add(new BasicNameValuePair("DID", getAndroid_id()));
+                params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
+                params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
+                params.add(new BasicNameValuePair("Latitude", String.valueOf(latitude)));
+                params.add(new BasicNameValuePair("Longitude", String.valueOf(longitude)));
+                params.add(new BasicNameValuePair("TelNum", number));
+                params.add(new BasicNameValuePair("switch", "retrieve_switches"));
                 UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                 httpPOST.setEntity(ent);
                 HttpResponse response = client.execute(httpPOST);
@@ -364,11 +396,11 @@ public class Control extends Login {
 
         @Override
         protected void onPostExecute(String result) {
-            ListDrawer();
+            CreateButtons();
         }
     }// end async task
-    public void ListDrawer() {
-        SparseArray<Group> groups = new SparseArray<>();
+    public void CreateButtons() {
+
         try {
             //textView.setText(jsonResult);
             JSONObject jsonResponse = new JSONObject(jsonResult);
