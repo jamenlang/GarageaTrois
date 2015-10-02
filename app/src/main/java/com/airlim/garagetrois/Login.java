@@ -47,6 +47,7 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
     volatile String authd = "false";
     volatile String admind = "false";
     volatile String geofence = "false";
+    volatile String switch_array = "";
     GPSTracker gps;
     public void onBackPressed() {
         if(textView.getText() == "Log in by entering your PIN") {
@@ -210,8 +211,8 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
         }
         protected void onPostExecute(String result) {
             if(result.startsWith(adminresult)){
-                String[] geofence_var = result.split(",");
-                geofence = geofence_var[1];
+                String[] response_var = result.split(",");
+                geofence = response_var[1];
                 Log.v("geofence",geofence);
                 Log.v("result",result);
                 authd = "true";
@@ -220,8 +221,8 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
                 finish();
             }
             else if(result.startsWith(userresult)){
-                String[] geofence_var = result.split(",");
-                geofence = geofence_var[1];
+                String[] response_var = result.split(",");
+                geofence = response_var[1];
                 Log.v("geofence",geofence);
                 Log.v("result",result);
                 authd = "true";
@@ -231,9 +232,9 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
             else{
                 Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
                 if(debug)
-                    textView.setText(result);
+                   textView.setText(result);
                 else
-                    textView.setText("Invalid Response From Server");
+                  textView.setText("Invalid Response From Server");
             }
         }
 
@@ -273,21 +274,17 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
         int x4 = numPicker4.getValue();
         String formatted = String.format("%d%d%d%d", x, x2, x3, x4);
         intent.putExtra("uid", formatted);
+        intent.putExtra("geofence", geofence);
+        intent.putExtra("nfc", getNfc_support());
+        intent.putExtra("devicename", getDeviceName());
+        intent.putExtra("did", getAndroid_id());
+        intent.putExtra("number", getTel_number());
+        intent.putExtra("switch_array", switch_array);
         if (admind.equals("true")){
             intent.putExtra("admind", "true");
-            intent.putExtra("geofence", geofence);
-            intent.putExtra("nfc", getNfc_support());
-            intent.putExtra("devicename", getDeviceName());
-            intent.putExtra("did", getAndroid_id());
-            intent.putExtra("number", getTel_number());
         }
         else {
             intent.putExtra("admind", "false");
-            intent.putExtra("geofence", geofence);
-            intent.putExtra("nfc", getNfc_support());
-            intent.putExtra("devicename", getDeviceName());
-            intent.putExtra("did", getAndroid_id());
-            intent.putExtra("number", getTel_number());
         }
         startActivity(intent);
     }

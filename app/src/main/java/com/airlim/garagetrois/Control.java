@@ -4,18 +4,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 //import android.support.v4.app.Fragment;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 //import android.view.LayoutInflater;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 //import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -29,22 +35,29 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
 public class Control extends Login {
     TextView textView;
+    private String jsonResult;
     volatile String reverse = "false";
     volatile String uid = "0000";
     volatile String did = "0000";
     volatile String devicename = "";
     volatile String number = "";
     volatile String nfc = "";
+    volatile String switch_array = "";
     GPSTracker gps;
 
     @Override
@@ -53,21 +66,20 @@ public class Control extends Login {
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         did = intent.getStringExtra("did");
+        switch_array = intent.getStringExtra("switch_array");
         devicename = intent.getStringExtra("devicename");
         number = intent.getStringExtra("number");
         nfc = intent.getStringExtra("nfc");
         admind = intent.getStringExtra("admind");
         geofence = intent.getStringExtra("geofence");
-        Log.v("geofence",geofence);
+        Log.v("geofence", geofence);
 
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.control);
-        ToggleButton b3 = (ToggleButton) findViewById(R.id.button3);
-        ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
-        ToggleButton b4 = (ToggleButton) findViewById(R.id.button4);
+        LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayout1);
         textView = (TextView) findViewById(R.id.textView02);
-
+        textView.setText(switch_array);
         gps = new GPSTracker(Control.this);
         if(gps.canGetLocation()) {
 
@@ -84,7 +96,7 @@ public class Control extends Login {
             // \n is for new line
             Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
             if(debug)
-            Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
         } else {
             // Can't get location.
             // GPS or network is not enabled.
@@ -93,106 +105,98 @@ public class Control extends Login {
                 textView.setText("Geofence Enabled: GPS Not Available.");
             }
             gps.showSettingsAlert();
+            finish();
         }
-        b3.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v) {
-                textView.setText("Toggling light...");
-                ToggleButton tb = (ToggleButton) v;
-                tb.setEnabled(!tb.isEnabled());
-                tb.setChecked(!tb.isChecked());
-                ControlTask task = new ControlTask();
-                task.execute("Light");
-
-            }
-        });
-        b2.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v) {
-                textView.setText("Toggling door...");
-                ToggleButton tb = (ToggleButton) v;
-                tb.setEnabled(!tb.isEnabled());
-                tb.setChecked(!tb.isChecked());
-                ControlTask task = new ControlTask();
-                task.execute("Door");
-            }
-        });
-        b4.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v) {
-                textView.setText("Toggling lock...");
-                ToggleButton tb = (ToggleButton) v;
-                tb.setEnabled(!tb.isEnabled());
-                tb.setChecked(!tb.isChecked());
-                ControlTask task = new ControlTask();
-                task.execute("Lock");
-            }
-
-        });
-
-
+        accessWebService();
     }
 
     public void onBackPressed() {
         finish();
     }
-
-    public class LoadData extends AsyncTask<Void, Void, Void> {
-        Integer sleepytime = Client_Functions.getPrefInt("sleepytime", getApplicationContext());
-
-        ToggleButton b2 = (ToggleButton) findViewById(R.id.button2);
-        TextView textView = (TextView) findViewById(R.id.textView02);
-        ProgressBar myProgress = (ProgressBar) findViewById(R.id.progressBar);
-        @Override
-        protected void onPreExecute()
-        {
-            textView.setText("Toggling door...");
-            myProgress.setMax(100);
-            myProgress.setVisibility(View.VISIBLE);
-        }
-        protected Void doInBackground(Void... params)
-        {
-            int var = (reverse.equals("false")) ? 0 : 100;
-            int goal = (reverse.equals("false")) ? 100 : 0;
-            while(var != goal)
-            {
-                try {
-                    Thread.sleep(sleepytime);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (reverse.equals("false"))
-                    var++;
-                else
-                    var--;
-                myProgress.setProgress(var);
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        textView.setText("Moving...");
-                    }
-                });
-            }
-
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void result)
-        {
-            b2.setEnabled(!b2.isEnabled());
-            b2.setChecked(!b2.isChecked());
-            textView.setText("Door toggled");
-            if(reverse.equals("false"))
-                reverse = "true";
-            else
-                reverse = "false";
-            super.onPostExecute(result);
+    public String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.startsWith(manufacturer)) {
+            return model;
+        } else {
+            return manufacturer + " " + model;
         }
     }
+
+    public String getNfc_support() {
+        return String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
+
+    }
+
+    public String getAndroid_id() {
+        return Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+    public String getTel_number() {
+        TelephonyManager telMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+        return telMgr.getLine1Number();
+    }
+    public void runTimer(final int id){
+        final ToggleButton triggerBtn = (ToggleButton) findViewById(id);
+        //---new task----
+        AsyncTask<Void,Void,Void> task = new AsyncTask<Void, Void, Void>(){
+            TextView textView = (TextView) findViewById(R.id.textView02);
+            ProgressBar myProgress = (ProgressBar) findViewById(R.id.progressBar);
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                myProgress.setMax(100);
+                myProgress.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+
+                //----update result---
+                //textView.setText("Finished");
+
+                //----re-enable button---
+                triggerBtn.setEnabled(true);
+                if(reverse.equals("false"))
+                    reverse = "true";
+                else
+                    reverse = "false";
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                Integer sleepytime = Client_Functions.getPrefInt("sleepytime_" + id, getApplicationContext());
+                int var = (reverse.equals("false")) ? 0 : 100;
+                int goal = (reverse.equals("false")) ? 100 : 0;
+                //-----do time consuming stuff here ---
+                while(var != goal)
+                {
+                    try {
+                        Thread.sleep(sleepytime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (reverse.equals("false"))
+                        var++;
+                    else
+                        var--;
+                    final int finalVar = var;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            myProgress.setProgress(finalVar);
+                            textView.setText("Waiting...");
+                        }
+                    });
+                }
+                return null;
+            }
+        };
+        //----run task----
+        task.execute();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (admind.equals("true")){
@@ -244,49 +248,35 @@ public class Control extends Login {
         }
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    /*
-    public static class PlaceholderFragment extends Fragment {
+    public void runControl(final String app_will_request, final int id) {
+        final ToggleButton triggerBtn = (ToggleButton) findViewById(id);
+        triggerBtn.setEnabled(false);
+        
+        //---new task----
+        AsyncTask<String, String, String> task = new AsyncTask<String, String, String>() {
+            double latitude = gps.getLatitude();
+            double longitude = gps.getLongitude();
+            String server = Client_Functions.getPref("server_URL", getApplicationContext());
+            String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+            String script = Client_Functions.getPref("script_name", getApplicationContext());
+            String fullurl = "http://" + server + ((path.equals("")) ? script : "/" + path + "/" + script);
 
-        public PlaceholderFragment() {
-        }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-    }
-*/
-    private class ControlTask extends AsyncTask<String, String, String> {
-        double latitude = gps.getLatitude();
-        double longitude = gps.getLongitude();
-        volatile String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        volatile String nfc_support = String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
-        String server = Client_Functions.getPref("server_URL", getApplicationContext());
-        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
-        String script = Client_Functions.getPref("script_name", getApplicationContext());
-        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
+            protected String doInBackground(String... urls) {
+                String response = "";
 
-        protected String doInBackground(String... urls) {
-            String response = "";
-
-            for (String url : urls) {
                 try {
                     HttpClient client = new DefaultHttpClient();
                     HttpPost httpPOST = new HttpPost(fullurl);
                     List<NameValuePair> params = new ArrayList<>();
                     params.add(new BasicNameValuePair("UID", uid));
-                    params.add(new BasicNameValuePair("DID", android_id));
+                    params.add(new BasicNameValuePair("DID", getAndroid_id()));
                     params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
-                    params.add(new BasicNameValuePair("hasNFC", nfc_support));
+                    params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
                     params.add(new BasicNameValuePair("Latitude", String.valueOf(latitude)));
                     params.add(new BasicNameValuePair("Longitude", String.valueOf(longitude)));
                     params.add(new BasicNameValuePair("TelNum", number));
-                    params.add(new BasicNameValuePair("switch", url));
+                    params.add(new BasicNameValuePair("switch", app_will_request));
                     UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
                     httpPOST.setEntity(ent);
                     HttpResponse execute = client.execute(httpPOST);
@@ -299,41 +289,190 @@ public class Control extends Login {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                final String sleepytime_id = "sleepytime_" + id;
+                int sleepytime = Client_Functions.getPrefInt(sleepytime_id, getApplicationContext());
+                if (sleepytime > 0) {
+                    runTimer(id);
+                }
+                return response;
             }
-            return response;
-        }
-        protected void onPostExecute(String result) {
-            switch (result) {
-                case "Door toggled":
-                    LoadData task = new LoadData();
-                    task.execute();
-                    break;
-                case "Light toggled":
-                    ToggleButton b3 = (ToggleButton) findViewById(R.id.button3);
-                    b3.setEnabled(!b3.isEnabled());
-                    b3.setChecked(!b3.isChecked());
-                    textView.setText(result);
-                    break;
-                case "Lock toggled":
-                    ToggleButton b4 = (ToggleButton) findViewById(R.id.button4);
-                    b4.setEnabled(!b4.isEnabled());
-                    b4.setChecked(!b4.isChecked());
-                    textView.setText(result);
-                    break;
-                case "Log in":
+
+            protected void onPostExecute(String result) {
+                if (result == "Log in") {
                     finish();
-                    break;
-                default:
-                    Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
-                    if(debug) {
-                        textView.setText(result);
-                        finish();
-                    }else{
-                        textView.setText("Invalid Response From Server");
-                        finish();
-                    }
+                }
+                String[] callback_info = result.split(",");
+                final int id = Integer.parseInt(callback_info[0]);
+                final int state = Integer.parseInt(callback_info[1]);
+                ToggleButton b = (ToggleButton) findViewById(id);
+                //b.setEnabled(!b.isEnabled());
+                final String sleepytime_id = "sleepytime_" + callback_info[0];
+                int sleepytime = Client_Functions.getPrefInt(sleepytime_id, getApplicationContext());
+
+                switch (state) {
+                    case 2:
+                        b.setChecked(!b.isChecked());
+                        break;
+                    case 0:
+                        b.setChecked(false);
+                        break;
+                    case 1:
+                        b.setChecked(true);
+                        break;
+                    default:
+                        break;
+                }
+                if (sleepytime > 0) {
+                    //runTimer(id);
+                } else {
+                    b.setEnabled(true);
+                }
+                textView.setText(callback_info[2]);
             }
+        };
+        //----run task----
+        task.execute();
+    }
+
+    private class JsonReadTask extends AsyncTask<String, Void, String> {
+        double latitude = gps.getLatitude();
+        double longitude = gps.getLongitude();
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+            try {
+                HttpClient client = new DefaultHttpClient();
+
+                HttpPost httpPOST = new HttpPost(fullurl);
+                List<NameValuePair> params = new ArrayList<>();
+
+                params.add(new BasicNameValuePair("retrieve", "switch_info"));
+                params.add(new BasicNameValuePair("UID", uid));
+                params.add(new BasicNameValuePair("DID", getAndroid_id()));
+                params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
+                params.add(new BasicNameValuePair("hasNFC", getNfc_support()));
+                params.add(new BasicNameValuePair("Latitude", String.valueOf(latitude)));
+                params.add(new BasicNameValuePair("Longitude", String.valueOf(longitude)));
+                params.add(new BasicNameValuePair("TelNum", number));
+                params.add(new BasicNameValuePair("switch", "retrieve_switches"));
+                UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
+                httpPOST.setEntity(ent);
+                HttpResponse response = client.execute(httpPOST);
+                jsonResult = inputStreamToString(response.getEntity().getContent()).toString();
+
+            }
+
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
+
+        private StringBuilder inputStreamToString(InputStream is) {
+            String rLine;
+            StringBuilder answer = new StringBuilder();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+
+            try {
+                while ((rLine = rd.readLine()) != null) {
+                    answer.append(rLine);
+                }
+            }
+
+            catch (IOException e) {
+                // e.printStackTrace();
+                Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+                if(debug)
+                    Toast.makeText(getApplicationContext(),
+                            "Error..." + e.toString(), Toast.LENGTH_LONG).show();
+            }
+            return answer;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            CreateButtons();
+        }
+    }// end async task
+    public void CreateButtons() {
+
+        try {
+            //textView.setText(jsonResult);
+            JSONObject jsonResponse = new JSONObject(jsonResult);
+            JSONArray jsonMainNode = jsonResponse.optJSONArray("switch_info");
+            //.setText("" + jsonMainNode.length());
+
+            for (int i = 0; i < jsonMainNode.length(); i++) {
+                final JSONObject jsonChildNode = jsonMainNode.getJSONObject(i);
+                //textView.setText(jsonChildNode.toString());
+                //final JSONObject jsonChildNode = jsonMainNode.getJSONObject(i);
+                final String name = jsonChildNode.optString("name");
+                final String app_will_request = jsonChildNode.optString("app_will_request");
+
+                if(jsonChildNode.optString("timeout") != "") {
+                    final String sleepytime = jsonChildNode.optString("timeout");
+                    SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                    prefs.putString("sleepytime_" + i, sleepytime);
+                    prefs.commit();
+                }
+                else{
+                    final String sleepytime = "0";
+                    SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                    prefs.putString("sleepytime_" + i, sleepytime);
+                    prefs.commit();
+                }
+
+                LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayout1);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                ToggleButton btn = new ToggleButton(this);
+                btn.setId(i);
+                final int id_ = btn.getId();
+                btn.setText(name);
+                btn.setTextOn(name);
+                btn.setTextOff(name);
+                ll.addView(btn, params);
+                btn = (ToggleButton) findViewById(id_);
+                btn.setOnClickListener(new View.OnClickListener() {
+                     public void onClick(View view) {
+                         textView.setText("Toggling " + name + "...");
+                         ToggleButton tb = (ToggleButton) view;
+                         tb.setEnabled(!tb.isEnabled());
+                         tb.setChecked(!tb.isChecked());
+                         runControl(app_will_request, id_);
+                     }
+                });
+            }
+        } catch (JSONException e) {
+            Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+            if(debug)
+                Toast.makeText(getApplicationContext(), "Error" + e.toString(),
+                        Toast.LENGTH_SHORT).show();
+        }
+
+        //ExpandableListView listView = (ExpandableListView) findViewById(R.id.listView);
+
+        //MyExpandableListAdapter adapter = new MyExpandableListAdapter(this,
+          //      groups);
+        //listView.setAdapter(adapter);
+
+    }
+
+    public void accessWebService() {
+        String server = Client_Functions.getPref("server_URL", getApplicationContext());
+        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
+        String script = Client_Functions.getPref("script_name", getApplicationContext());
+        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
+        JsonReadTask task = new JsonReadTask();
+
+        // passes values for the urls string array
+        task.execute(fullurl);
     }
     public void show_users()
     {
