@@ -107,7 +107,9 @@ public class Control extends Login {
             gps.showSettingsAlert();
             finish();
         }
-        accessWebService();
+
+        JsonReadTask task = new JsonReadTask();
+        task.execute();
     }
 
     public void onBackPressed() {
@@ -125,7 +127,6 @@ public class Control extends Login {
 
     public String getNfc_support() {
         return String.valueOf(getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC));
-
     }
 
     public String getAndroid_id() {
@@ -398,19 +399,15 @@ public class Control extends Login {
         protected void onPostExecute(String result) {
             CreateButtons();
         }
-    }// end async task
+    }
     public void CreateButtons() {
 
         try {
-            //textView.setText(jsonResult);
             JSONObject jsonResponse = new JSONObject(jsonResult);
             JSONArray jsonMainNode = jsonResponse.optJSONArray("switch_info");
-            //.setText("" + jsonMainNode.length());
 
             for (int i = 0; i < jsonMainNode.length(); i++) {
                 final JSONObject jsonChildNode = jsonMainNode.getJSONObject(i);
-                //textView.setText(jsonChildNode.toString());
-                //final JSONObject jsonChildNode = jsonMainNode.getJSONObject(i);
                 final String name = jsonChildNode.optString("name");
                 final String app_will_request = jsonChildNode.optString("app_will_request");
 
@@ -455,25 +452,8 @@ public class Control extends Login {
                 Toast.makeText(getApplicationContext(), "Error" + e.toString(),
                         Toast.LENGTH_SHORT).show();
         }
-
-        //ExpandableListView listView = (ExpandableListView) findViewById(R.id.listView);
-
-        //MyExpandableListAdapter adapter = new MyExpandableListAdapter(this,
-          //      groups);
-        //listView.setAdapter(adapter);
-
     }
 
-    public void accessWebService() {
-        String server = Client_Functions.getPref("server_URL", getApplicationContext());
-        String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
-        String script = Client_Functions.getPref("script_name", getApplicationContext());
-        String fullurl = "http://"+server+((path.equals(""))? script : "/"+path+"/"+script);
-        JsonReadTask task = new JsonReadTask();
-
-        // passes values for the urls string array
-        task.execute(fullurl);
-    }
     public void show_users()
     {
         final Context context = this;
