@@ -92,7 +92,7 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("server_URL"));
         bindPreferenceSummaryToValue(findPreference("script_path"));
         bindPreferenceSummaryToValue(findPreference("script_name"));
-        bindPreferenceSummaryToValue(findPreference("sleepytime"));
+        //bindPreferenceSummaryToValue(findPreference("sleepytime"));
     }
 
     /**
@@ -161,11 +161,11 @@ public class SettingsActivity extends PreferenceActivity {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 Log.v("preference", preference.toString());
-                if (preference.toString().startsWith("Sleep")){
-                    preference.setSummary(stringValue + " Seconds");
-                }
-                else
-                    preference.setSummary(stringValue);
+                //if (preference.toString().startsWith("Sleep")){
+                //    preference.setSummary(stringValue + " Seconds");
+                //}
+                //else
+                preference.setSummary(stringValue);
 
             }
             return true;
@@ -228,7 +228,7 @@ public class SettingsActivity extends PreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("server_URL"));
             bindPreferenceSummaryToValue(findPreference("script_path"));
             bindPreferenceSummaryToValue(findPreference("script_name"));
-            bindPreferenceSummaryToValue(findPreference("sleepytime"));
+            //bindPreferenceSummaryToValue(findPreference("sleepytime"));
         }
     }
     public static class AuthenticationPreferenceFragment extends PreferenceFragment {
