@@ -13,3 +13,10 @@ dependencies:
 test:
   override:
     - ./gradlew assembleDebug
+
+deployment:
+  release:
+    tag: /v[0-9]+(\.[0-9]+)*/
+    owner: jamenlang
+    commands:
+      - ./deploy_master.sh
