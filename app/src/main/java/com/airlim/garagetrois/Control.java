@@ -57,7 +57,6 @@ public class Control extends Login {
     volatile String devicename = "";
     volatile String number = "";
     volatile String nfc = "";
-    volatile String switch_array = "";
     GPSTracker gps;
 
     @Override
@@ -66,23 +65,20 @@ public class Control extends Login {
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         did = intent.getStringExtra("did");
-        switch_array = intent.getStringExtra("switch_array");
         devicename = intent.getStringExtra("devicename");
         number = intent.getStringExtra("number");
         nfc = intent.getStringExtra("nfc");
         admind = intent.getStringExtra("admind");
+        authd = intent.getStringExtra("authd");
         geofence = intent.getStringExtra("geofence");
         Log.v("geofence", geofence);
 
         super.onCreate(savedInstanceState);
-
+        Log.v("oncreatecontrol", uid);
         setContentView(R.layout.control);
-        LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayout1);
         textView = (TextView) findViewById(R.id.textView02);
-        textView.setText(switch_array);
         gps = new GPSTracker(Control.this);
         if(gps.canGetLocation()) {
-
             double latitude = gps.getLatitude();
             double longitude = gps.getLongitude();
             if(geofence.equals("true")){
@@ -137,10 +133,13 @@ public class Control extends Login {
         TelephonyManager telMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
         return telMgr.getLine1Number();
     }
+
     public void runTimer(final int id){
         final ToggleButton triggerBtn = (ToggleButton) findViewById(id);
+
         //---new task----
         AsyncTask<Void,Void,Void> task = new AsyncTask<Void, Void, Void>(){
+
             TextView textView = (TextView) findViewById(R.id.textView02);
             ProgressBar myProgress = (ProgressBar) findViewById(R.id.progressBar);
             @Override
@@ -174,7 +173,11 @@ public class Control extends Login {
                 while(var != goal)
                 {
                     try {
-                        Thread.sleep(sleepytime);
+                        final String dsleepytime_id = "dsleepytime_" + id;
+                        String dsleepytime = Client_Functions.getPref(dsleepytime_id, getApplicationContext());
+                        if(dsleepytime.equals("after")){
+                            Thread.sleep(sleepytime);
+                        }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -187,7 +190,7 @@ public class Control extends Login {
                         @Override
                         public void run() {
                             myProgress.setProgress(finalVar);
-                            textView.setText("Waiting...");
+                            //textView.setText("Waiting...");
                         }
                     });
                 }
@@ -225,6 +228,39 @@ public class Control extends Login {
         super.onValueChange(picker, oldVal, newVal);
     }
 
+    public class BlindProgress extends AsyncTask<Void, Void, Void> {
+        ProgressBar myProgress = (ProgressBar) findViewById(R.id.progressBar);
+        @Override
+        protected void onPreExecute() {
+            myProgress.setMax(100);
+            myProgress.setVisibility(View.VISIBLE);
+        }
+
+        protected Void doInBackground(Void... params) {
+            int var =  0;
+            int goal = 100;
+            while (var != goal) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                var++;
+
+                final int finalVar = var;
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        myProgress.setProgress(finalVar);
+                    }
+                });
+            }
+
+            return null;
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -252,15 +288,20 @@ public class Control extends Login {
     public void runControl(final String app_will_request, final int id) {
         final ToggleButton triggerBtn = (ToggleButton) findViewById(id);
         triggerBtn.setEnabled(false);
-        
+
+        BlindProgress rtask = new BlindProgress();
+        rtask.execute();
+
         //---new task----
         AsyncTask<String, String, String> task = new AsyncTask<String, String, String>() {
+
             double latitude = gps.getLatitude();
             double longitude = gps.getLongitude();
             String server = Client_Functions.getPref("server_URL", getApplicationContext());
             String path = Client_Functions.cleanPath(Client_Functions.getPref("script_path", getApplicationContext()));
             String script = Client_Functions.getPref("script_name", getApplicationContext());
             String fullurl = "http://" + server + ((path.equals("")) ? script : "/" + path + "/" + script);
+
 
 
             protected String doInBackground(String... urls) {
@@ -284,17 +325,15 @@ public class Control extends Login {
                     InputStream content = execute.getEntity().getContent();
                     BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
                     String s;
+
                     while ((s = buffer.readLine()) != null) {
                         response += s;
                     }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                final String sleepytime_id = "sleepytime_" + id;
-                int sleepytime = Client_Functions.getPrefInt(sleepytime_id, getApplicationContext());
-                if (sleepytime > 0) {
-                    runTimer(id);
-                }
+
                 return response;
             }
 
@@ -308,30 +347,44 @@ public class Control extends Login {
                 ToggleButton b = (ToggleButton) findViewById(id);
                 //b.setEnabled(!b.isEnabled());
                 final String sleepytime_id = "sleepytime_" + callback_info[0];
+                final String dsleepytime_id = "dsleepytime_" + callback_info[0];
                 int sleepytime = Client_Functions.getPrefInt(sleepytime_id, getApplicationContext());
+                String dsleepytime = Client_Functions.getPref(dsleepytime_id, getApplicationContext());
 
                 switch (state) {
+                    //2 is toggled
                     case 2:
                         b.setChecked(!b.isChecked());
                         break;
+                    //0 is off
                     case 0:
                         b.setChecked(false);
                         break;
+                    //1 is on
                     case 1:
                         b.setChecked(true);
                         break;
                     default:
                         break;
                 }
-                if (sleepytime > 0) {
-                    //runTimer(id);
-                } else {
+
+                if(dsleepytime.equals("after")){
+                    if (sleepytime > 0) {
+                        runTimer(id);
+                    }
+                    else{
+                        b.setEnabled(true);
+                    }
+                }
+                else{
                     b.setEnabled(true);
                 }
+
                 textView.setText(callback_info[2]);
             }
         };
         //----run task----
+
         task.execute();
     }
 
@@ -352,7 +405,7 @@ public class Control extends Login {
                 HttpPost httpPOST = new HttpPost(fullurl);
                 List<NameValuePair> params = new ArrayList<>();
 
-                params.add(new BasicNameValuePair("retrieve", "switch_info"));
+                //params.add(new BasicNameValuePair("retrieve", "switch_info"));
                 params.add(new BasicNameValuePair("UID", uid));
                 params.add(new BasicNameValuePair("DID", getAndroid_id()));
                 params.add(new BasicNameValuePair("DeviceName", getDeviceName()));
@@ -405,7 +458,12 @@ public class Control extends Login {
         try {
             JSONObject jsonResponse = new JSONObject(jsonResult);
             JSONArray jsonMainNode = jsonResponse.optJSONArray("switch_info");
-
+            LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayout1);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 22, 0, 0);
             for (int i = 0; i < jsonMainNode.length(); i++) {
                 final JSONObject jsonChildNode = jsonMainNode.getJSONObject(i);
                 final String name = jsonChildNode.optString("name");
@@ -424,16 +482,26 @@ public class Control extends Login {
                     prefs.commit();
                 }
 
-                LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayout1);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                if(jsonChildNode.optString("display_progress") != "") {
+                    final String dsleepytime = jsonChildNode.optString("display_progress");
+                    SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                    prefs.putString("dsleepytime_" + i, dsleepytime);
+                    prefs.commit();
+                }
+                else{
+                    final String dsleepytime = "notapplicable";
+                    SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                    prefs.putString("dsleepytime_" + i, dsleepytime);
+                    prefs.commit();
+                }
+
                 ToggleButton btn = new ToggleButton(this);
                 btn.setId(i);
                 final int id_ = btn.getId();
                 btn.setText(name);
                 btn.setTextOn(name);
                 btn.setTextOff(name);
+                //btn.setLayoutParams(params);
                 ll.addView(btn, params);
                 btn = (ToggleButton) findViewById(id_);
                 btn.setOnClickListener(new View.OnClickListener() {

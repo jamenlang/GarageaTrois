@@ -33,6 +33,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
 import android.widget.Toast;
 
 import static java.lang.Integer.valueOf;
@@ -43,11 +45,11 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
 
     private TextView textView;
     //volatile String a, a2, a3, a4;
-
+    volatile String uid = "";
+    public String tryuid = "gps0";
     volatile String authd = "false";
     volatile String admind = "false";
     volatile String geofence = "false";
-    volatile String switch_array = "";
     GPSTracker gps;
     public void onBackPressed() {
         if(textView.getText() == "Log in by entering your PIN") {
@@ -57,13 +59,39 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
             textView.setText("Log in by entering your PIN");
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        if(authd.equals("false")){
+            gps = new GPSTracker(this);
+            if(gps.canGetLocation()) {
+                double latitude = gps.getLatitude();
+                double longitude = gps.getLongitude();
+                LogInTask task = new LogInTask();
+
+                task.execute(tryuid);
+                // \n is for new line
+                Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+                if(debug)
+                    Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+            } else {
+                // Can't get location.
+                // GPS or network is not enabled.
+                // Ask user to enable GPS/network in settings.
+                Boolean gpsNag = Client_Functions.getPrefBool("gpsNag", getApplicationContext());
+                Log.v("gpsnagstatus", gpsNag.toString());
+                if (gpsNag)
+                    gps.showSettingsAlert();
+                // only do this once.
+                SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                prefs.putBoolean("gpsNag", false);
+                prefs.commit();
+            }
+        }
+
         setContentView(R.layout.activity_main);
-
-
         //a = a2 = a3 = a4 = "0";
         textView = (TextView) findViewById(R.id.TextView01);
 
@@ -111,33 +139,10 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             }
         });
-        gps = new GPSTracker(Login.this);
-        if(gps.canGetLocation()) {
-
-            double latitude = gps.getLatitude();
-            double longitude = gps.getLongitude();
-
-            // \n is for new line
-            Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
-            if(debug)
-            Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
-        } else {
-            // Can't get location.
-            // GPS or network is not enabled.
-            // Ask user to enable GPS/network in settings.
-            Boolean gpsNag = Client_Functions.getPrefBool("gpsNag", getApplicationContext());
-            if(gpsNag)
-                gps.showSettingsAlert();
-            // only do this once.
-            SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            prefs.putBoolean("gpsNag", false);
-            prefs.commit();
-        }
     }
 
     @Override
-    public void onValueChange(NumberPicker picker, int oldVal, int newVal)
-    {
+    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
         Log.i(picker + "value is", "" + newVal);
     }
 
@@ -218,7 +223,7 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
                 authd = "true";
                 admind = "true";
                 show();
-                finish();
+                //finish();
             }
             else if(result.startsWith(userresult)){
                 String[] response_var = result.split(",");
@@ -227,7 +232,7 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
                 Log.v("result",result);
                 authd = "true";
                 show();
-                finish();
+                //finish();
             }
             else{
                 Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
@@ -239,31 +244,7 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
         }
 
     }
-
-
-    public void onClick(View view) {
-        if(authd.equals("false")){
-            LogInTask task = new LogInTask();
-            NumberPicker numPicker = (NumberPicker)findViewById(R.id.numberPicker1);
-            int x = numPicker.getValue();
-            NumberPicker numPicker2 = (NumberPicker)findViewById(R.id.numberPicker2);
-            int x2 = numPicker2.getValue();
-            NumberPicker numPicker3 = (NumberPicker)findViewById(R.id.numberPicker3);
-            int x3 = numPicker3.getValue();
-            NumberPicker numPicker4 = (NumberPicker)findViewById(R.id.numberPicker4);
-            int x4 = numPicker4.getValue();
-            String formatted = String.format("%d%d%d%d", x, x2, x3, x4);
-            //String formatted = String.format("%s%s%s%s", a, a2, a3, a4);
-            task.execute(formatted);
-        }
-        else
-            show();
-    }
-
-    public void show()
-    {
-        final Context context = this;
-        Intent intent = new Intent(context, Control.class);
+    public String createuid(){
         NumberPicker numPicker = (NumberPicker)findViewById(R.id.numberPicker1);
         int x = numPicker.getValue();
         NumberPicker numPicker2 = (NumberPicker)findViewById(R.id.numberPicker2);
@@ -273,13 +254,33 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
         NumberPicker numPicker4 = (NumberPicker)findViewById(R.id.numberPicker4);
         int x4 = numPicker4.getValue();
         String formatted = String.format("%d%d%d%d", x, x2, x3, x4);
-        intent.putExtra("uid", formatted);
+        return formatted;
+
+    }
+
+    public void onClick(View view) {
+            LogInTask task = new LogInTask();
+            //String formatted = String.format("%s%s%s%s", a, a2, a3, a4);
+            task.execute(createuid());
+    }
+
+    public void show()
+    {
+        final Context context = this;
+        Intent intent = new Intent(context, Control.class);
+        if(tryuid.equals("gps0")) {
+            tryuid = "";
+            intent.putExtra("uid", "gps0");
+        }
+        else{
+            intent.putExtra("uid", createuid());
+        }
+        intent.putExtra("authd", "true");
         intent.putExtra("geofence", geofence);
         intent.putExtra("nfc", getNfc_support());
         intent.putExtra("devicename", getDeviceName());
         intent.putExtra("did", getAndroid_id());
         intent.putExtra("number", getTel_number());
-        intent.putExtra("switch_array", switch_array);
         if (admind.equals("true")){
             intent.putExtra("admind", "true");
         }

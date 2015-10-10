@@ -2,13 +2,6 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Jamen\Documents\GitHub\GarageaTrois\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\jars\libs\internal_impl-21.0.3.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
-        <dex dex="C:\Users\Jamen\Documents\GitHub\GarageaTrois\app\build\intermediates\pre-dexed\debug\internal_impl-21.0.3-9018d196ecc6431d42d21a460ff3496dded18063.jar" />
-    </item>
-    <item
         jar="C:\Users\Jamen\Documents\GitHub\GarageaTrois\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\jars\classes.jar"
         jumboMode="false"
         revision="19.1.0"
@@ -16,11 +9,18 @@
         <dex dex="C:\Users\Jamen\Documents\GitHub\GarageaTrois\app\build\intermediates\pre-dexed\debug\classes-8fe42f37b6daa89b1d14d0d2c862d234eb0f0825.jar" />
     </item>
     <item
-        jar="C:\Users\Jamen\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\21.0.3\support-annotations-21.0.3.jar"
+        jar="C:\Users\Jamen\AppData\Local\Android\Sdk\extras\android\m2repository\com\android\support\support-annotations\21.0.3\support-annotations-21.0.3.jar"
         jumboMode="false"
         revision="19.1.0"
         sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
-        <dex dex="C:\Users\Jamen\Documents\GitHub\GarageaTrois\app\build\intermediates\pre-dexed\debug\support-annotations-21.0.3-3f52a048046ba18bff2db16fc14fbc26897fd017.jar" />
+        <dex dex="C:\Users\Jamen\Documents\GitHub\GarageaTrois\app\build\intermediates\pre-dexed\debug\support-annotations-21.0.3-6bb1fe453a2f37460799e85a9d28efe88725c5cb.jar" />
+    </item>
+    <item
+        jar="C:\Users\Jamen\Documents\GitHub\GarageaTrois\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\jars\libs\internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
+        <dex dex="C:\Users\Jamen\Documents\GitHub\GarageaTrois\app\build\intermediates\pre-dexed\debug\internal_impl-21.0.3-9018d196ecc6431d42d21a460ff3496dded18063.jar" />
     </item>
 
 </items>
