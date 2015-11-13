@@ -515,10 +515,16 @@ public class Control extends Login {
                 });
             }
         } catch (JSONException e) {
-            Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
-            if(debug)
-                Toast.makeText(getApplicationContext(), "Error" + e.toString(),
-                        Toast.LENGTH_SHORT).show();
+            if(jsonResult.contains("Geo")){
+                Toast.makeText(getApplicationContext(), jsonResult,
+                        Toast.LENGTH_LONG).show();
+            }
+            else {
+                Boolean debug = Client_Functions.getPrefBool("debug", getApplicationContext());
+                if (debug)
+                    Toast.makeText(getApplicationContext(), "Error" + e.toString(),
+                            Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

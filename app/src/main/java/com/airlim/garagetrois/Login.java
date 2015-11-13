@@ -215,7 +215,8 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
             return response;
         }
         protected void onPostExecute(String result) {
-            if(result.startsWith(adminresult)){
+
+            if(result.startsWith(Hash.md5(adminresult))){
                 String[] response_var = result.split(",");
                 geofence = response_var[1];
                 Log.v("geofence",geofence);
@@ -225,7 +226,7 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
                 show();
                 //finish();
             }
-            else if(result.startsWith(userresult)){
+            else if(result.startsWith(Hash.md5(userresult))){
                 String[] response_var = result.split(",");
                 geofence = response_var[1];
                 Log.v("geofence",geofence);
