@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +19,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.provider.Settings.Secure;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import org.apache.http.HttpResponse;
@@ -33,6 +38,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import android.widget.Toast;
@@ -58,6 +64,19 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
         else {
             textView.setText("Log in by entering your PIN");
         }
+    }
+
+    private EditText findInput(ViewGroup np) {
+        int count = np.getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = np.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                findInput((ViewGroup) child);
+            } else if (child instanceof EditText) {
+                return (EditText) child;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -121,12 +140,62 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
                 np2.requestFocus();
             }
         });
+
+        EditText input = findInput(np);
+        TextWatcher tw = new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() != 0) {
+                    Integer value = Integer.parseInt(s.toString());
+                    if (value >= np.getMinValue()) {
+                        np.setValue(value);
+                        np2.requestFocus();
+                    }
+                }
+            }
+        };
+        input.addTextChangedListener(tw);
+
         np2.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 np3.requestFocus();
             }
         });
+
+        EditText input2 = findInput(np2);
+        TextWatcher tw2 = new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() != 0) {
+                    Integer value = Integer.parseInt(s.toString());
+                    if (value >= np2.getMinValue()) {
+                        np2.setValue(value);
+                        np3.requestFocus();
+                    }
+                }
+            }
+        };
+        input2.addTextChangedListener(tw2);
+
         np3.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
 
             @Override
@@ -134,11 +203,62 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
                 np4.requestFocus();
             }
         });
+
+        EditText input3 = findInput(np3);
+        TextWatcher tw3 = new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() != 0) {
+                    Integer value = Integer.parseInt(s.toString());
+                    if (value >= np3.getMinValue()) {
+                        np3.setValue(value);
+                        np4.requestFocus();
+                    }
+                }
+            }
+        };
+        input3.addTextChangedListener(tw3);
+
         np4.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             }
         });
+        EditText input4 = findInput(np4);
+        TextWatcher tw4 = new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() != 0) {
+                    Integer value = Integer.parseInt(s.toString());
+                    if (value >= np4.getMinValue()) {
+                        np4.setValue(value);
+                        np4.clearFocus();
+                        LogInTask task = new LogInTask();
+                        //String formatted = String.format("%s%s%s%s", a, a2, a3, a4);
+                        task.execute(createuid());
+                    }
+                }
+            }
+        };
+        input4.addTextChangedListener(tw4);
     }
 
     @Override
@@ -219,8 +339,9 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
             if(result.startsWith(Hash.md5(adminresult))){
                 String[] response_var = result.split(",");
                 geofence = response_var[1];
-                Log.v("geofence",geofence);
                 Log.v("result",result);
+                Log.v("geofence",geofence);
+
                 authd = "true";
                 admind = "true";
                 show();
@@ -247,12 +368,16 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
     }
     public String createuid(){
         NumberPicker numPicker = (NumberPicker)findViewById(R.id.numberPicker1);
+        numPicker.clearFocus();
         int x = numPicker.getValue();
         NumberPicker numPicker2 = (NumberPicker)findViewById(R.id.numberPicker2);
+        numPicker2.clearFocus();
         int x2 = numPicker2.getValue();
         NumberPicker numPicker3 = (NumberPicker)findViewById(R.id.numberPicker3);
+        numPicker3.clearFocus();
         int x3 = numPicker3.getValue();
         NumberPicker numPicker4 = (NumberPicker)findViewById(R.id.numberPicker4);
+        numPicker4.clearFocus();
         int x4 = numPicker4.getValue();
         String formatted = String.format("%d%d%d%d", x, x2, x3, x4);
         return formatted;
@@ -269,7 +394,7 @@ public class Login extends Activity implements NumberPicker.OnValueChangeListene
     {
         final Context context = this;
         Intent intent = new Intent(context, Control.class);
-        if(tryuid.equals("gps0")) {
+        if(tryuid.equals("gps0") && Objects.equals(createuid(), "0000")) {
             tryuid = "";
             intent.putExtra("uid", "gps0");
         }

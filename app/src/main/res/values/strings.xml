@@ -24,6 +24,7 @@
     <string name="admin_users">Garage à Trois - User List</string>
     <string name="wait_for_server">Waiting for server&#8230;</string>
     <string name="pref_title_debug">Debug</string>
+    <string name="pref_title_motion">Motion</string>
     <string name="action_settings">Settings</string>
 
 </resources>

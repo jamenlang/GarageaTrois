@@ -34,5 +34,6 @@
     <string name="pref_header_other_settings">Other Settings</string>
     <string name="pref_description_debug">Enable toast messages and raw HTML output to be displayed</string>
     <string name="pref_title_disablesettings">Disable Settings Menu</string>
+    <string name="pref_description_motion">Enable Motion webcam/camera image</string>
     <string name="pref_description_disablesettings">Disable access to this menu, this can be reverted by clearing app data.</string>
 </resources>
